@@ -59,7 +59,7 @@ function EVCharger({ color = 0x1abc9c, label, indicator = 'normal', onDoubleClic
 
   return (
     <group>
-      <Box args={[1.5, 3, 1]} position={[0, 1.5, 0]} castShadow receiveShadow onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
+      <Box args={[1.5, 3, 1]} position={[0, 1.5, 0]} castShadow receiveShadow onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }} onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }} onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(); }}>
         <meshPhongMaterial color={0x333333} />
         {hovered && <Edges color="white" />}
       </Box>
