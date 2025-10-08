@@ -42,7 +42,9 @@ function App() {
     sidebar: false,
     filter: false,
     equipment: false,
-    accident: false
+    accident: false,
+    floors: false,
+    equipmentOverview: false
   });
 
   const [evPanelOpen, setEvPanelOpen] = useState(false);
@@ -55,6 +57,12 @@ function App() {
   const [filterVisible, setFilterVisible] = useState(false);
   const [filterMin, setFilterMin] = useState(false);
   const [filterPos, setFilterPos] = useState({ x: 320, y: 145 });
+  const [floorsVisible, setFloorsVisible] = useState(false);
+  const [floorsMin, setFloorsMin] = useState(false);
+  const [floorsPos, setFloorsPos] = useState({ x: 20, y: 250 });
+  const [equipmentOverviewVisible, setEquipmentOverviewVisible] = useState(false);
+  const [equipmentOverviewMin, setEquipmentOverviewMin] = useState(false);
+  const [equipmentOverviewPos, setEquipmentOverviewPos] = useState({ x: 260, y: 250 });
   const [equipmentPanelOpen, setEquipmentPanelOpen] = useState(false);
   const [equipmentPanelType, setEquipmentPanelType] = useState('chiller');
   const [equipmentPanelMin, setEquipmentPanelMin] = useState(false);
@@ -123,7 +131,9 @@ function App() {
     sidebar: 0,
     filter: 0,
     equipment: 0,
-    ev: 0
+    ev: 0,
+    floors: 0,
+    equipmentOverview: 0
   });
 
   // Calculate smart position for new panels
@@ -142,6 +152,12 @@ function App() {
     }
     if ((equipmentPanelOpen || equipmentPanelMin) && panelId !== 'equipment') {
       openPanels.push({ ...equipmentPanelPos, width: 480, height: 60 });
+    }
+    if ((floorsVisible || floorsMin) && panelId !== 'floors') {
+      openPanels.push({ ...floorsPos, width: 220, height: 60 });
+    }
+    if ((equipmentOverviewVisible || equipmentOverviewMin) && panelId !== 'equipmentOverview') {
+      openPanels.push({ ...equipmentOverviewPos, width: 230, height: 60 });
     }
     if ((accidentOpen || accidentMin) && panelId !== 'accident') {
       openPanels.push({ ...accidentPos, width: 200, height: 60 });
@@ -227,12 +243,23 @@ function App() {
     });
   }, [getSmartPosition]);
 
-  const toggleEquipment = useCallback(() => {
-    setEquipmentPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.equipment) {
-        const pos = getSmartPosition('equipment', 480);
-        setEquipmentPanelPos(pos);
-        panelOpenedBefore.current.equipment = true;
+  const toggleFloors = useCallback(() => {
+    setFloorsVisible((v) => {
+      if (!v && !panelOpenedBefore.current.floors) {
+        const pos = getSmartPosition('floors', 220);
+        setFloorsPos(pos);
+        panelOpenedBefore.current.floors = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const toggleEquipmentOverview = useCallback(() => {
+    setEquipmentOverviewVisible((v) => {
+      if (!v && !panelOpenedBefore.current.equipmentOverview) {
+        const pos = getSmartPosition('equipmentOverview', 230);
+        setEquipmentOverviewPos(pos);
+        panelOpenedBefore.current.equipmentOverview = true;
       }
       return !v;
     });
@@ -320,6 +347,8 @@ function App() {
   const closeFilter = useCallback(() => setFilterVisible(false), []);
   const closeEquipment = useCallback(() => setEquipmentPanelOpen(false), []);
   const closeEV = useCallback(() => setEvPanelOpen(false), []);
+  const closeFloors = useCallback(() => setFloorsVisible(false), []);
+  const closeEquipmentOverview = useCallback(() => setEquipmentOverviewVisible(false), []);
 
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type });
@@ -554,8 +583,9 @@ function App() {
         {/* Bottom-left dock buttons (dark/compact) */}
         <div style={{ position: 'absolute', bottom: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
           <button title="Sidebar" onClick={toggleSidebar} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
+          <button title="Floors" onClick={toggleFloors} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
+          <button title="Equipment Overview" onClick={toggleEquipmentOverview} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
           <button title="Filter" onClick={toggleFilter} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
-          <button title="Equipment" onClick={toggleEquipment} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>E</button>
           <button title="EV Panel" onClick={toggleEV} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
         </div>
 
@@ -620,13 +650,24 @@ function App() {
                 <span>HVAC</span><span style={{ color: '#f59e0b', fontWeight: 800 }}>Check</span>
               </div>
             </div>
-            <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '6px', marginBottom: '8px', color: '#e5e7eb' }}>Floors</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: '#9ca3af' }}>Use the dock to access floors and equipment overviews.</div>
+          </DraggablePanel>
+        )}
+
+        {/* Floors panel (draggable) */}
+        {floorsVisible && (
+          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {['All Overview','Floor 1 - Lobby & EV','Floor 2 - Office','Floor 3 - Data Center','Floor 4 - Mechanical','Floor 5 - Rooftop'].map((t, i) => (
                 <button key={i} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'left', fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>{t}</button>
               ))}
             </div>
-            <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '6px', marginBottom: '8px', color: '#e5e7eb' }}>Equipment</div>
+          </DraggablePanel>
+        )}
+
+        {/* Equipment overview panel (draggable) */}
+        {equipmentOverviewVisible && (
+          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <button onClick={() => openEquipmentPanel('chiller')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
