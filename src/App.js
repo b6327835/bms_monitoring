@@ -32,6 +32,10 @@ function App() {
   const [showPump, setShowPump] = useState(true);
   const [showFire, setShowFire] = useState(true);
   
+  // Camera controls
+  const cameraControlsRef = React.useRef(null);
+  const zoomIntervalRef = React.useRef(null);
+  
   // Track if panels have been opened before
   const panelOpenedBefore = React.useRef({
     ev: false,
@@ -256,6 +260,60 @@ function App() {
     });
   }, [getSmartPosition]);
 
+  // Camera control functions
+  const handleCameraHome = useCallback(() => {
+    if (cameraControlsRef.current) {
+      cameraControlsRef.current.reset();
+    }
+  }, []);
+
+  const startZoom = useCallback((direction) => {
+    if (zoomIntervalRef.current) return;
+    
+    const zoom = () => {
+      if (cameraControlsRef.current && cameraControlsRef.current.object) {
+        const camera = cameraControlsRef.current.object;
+        const target = cameraControlsRef.current.target;
+        
+        // Calculate direction vector from camera to target
+        const direction_vec = {
+          x: target.x - camera.position.x,
+          y: target.y - camera.position.y,
+          z: target.z - camera.position.z
+        };
+        
+        // Normalize and scale - much smaller steps for smoother zoom
+        const length = Math.sqrt(direction_vec.x ** 2 + direction_vec.y ** 2 + direction_vec.z ** 2);
+        const scaleFactor = direction === 'in' ? 0.015 : -0.015; // Reduced from 0.05 to 0.015
+        
+        camera.position.x += (direction_vec.x / length) * scaleFactor * length;
+        camera.position.y += (direction_vec.y / length) * scaleFactor * length;
+        camera.position.z += (direction_vec.z / length) * scaleFactor * length;
+        
+        cameraControlsRef.current.update();
+      }
+    };
+    
+    zoom(); // Immediate zoom
+    zoomIntervalRef.current = setInterval(zoom, 16); // ~60fps for smooth animation
+  }, []);
+
+  const stopZoom = useCallback(() => {
+    if (zoomIntervalRef.current) {
+      clearInterval(zoomIntervalRef.current);
+      zoomIntervalRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (zoomIntervalRef.current) {
+        clearInterval(zoomIntervalRef.current);
+      }
+    };
+  }, []);
+
   // Memoized callbacks to prevent unnecessary re-renders
   const closeAccident = useCallback(() => setAccidentOpen(false), []);
   const closeSidebar = useCallback(() => setSidebarVisible(false), []);
@@ -443,6 +501,25 @@ function App() {
         <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 12, display: 'flex', gap: 10 }}>
           <div style={{ fontWeight: 700 }}>3D Building Simulation - BMS Monitoring</div>
           <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
+        </div>
+
+        {/* Camera Controls - Vertical Dock (Top Right) */}
+        <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 4, display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(17,24,39,0.4)', padding: 6, borderRadius: 8, border: '1px solid rgba(31,41,55,0.5)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+          <button title="Reset Camera" onClick={handleCameraHome} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏠</button>
+          <button 
+            title="Zoom In (Hold to zoom continuously)" 
+            onMouseDown={() => startZoom('in')} 
+            onMouseUp={stopZoom} 
+            onMouseLeave={stopZoom}
+            style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >+</button>
+          <button 
+            title="Zoom Out (Hold to zoom continuously)" 
+            onMouseDown={() => startZoom('out')} 
+            onMouseUp={stopZoom} 
+            onMouseLeave={stopZoom}
+            style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >−</button>
         </div>
 
         {/* Transparency slider - above bottom-left dock */}
@@ -677,7 +754,7 @@ function App() {
           style={{ background: '#151518ff' }}
           shadows
         >
-          <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+          <OrbitControls ref={cameraControlsRef} enableZoom={true} enablePan={true} enableRotate={true} makeDefault />
           <BuildingModel 
             opacity={opacity}
             showBuilding={showBuilding}
