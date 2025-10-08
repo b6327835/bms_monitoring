@@ -1,6 +1,22 @@
 import React from 'react';
 import * as THREE from 'three';
 import { Box, Cylinder, Sphere, Plane, Text } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+
+function AnimatedGroup({ children, isFault }) {
+  const groupRef = React.useRef();
+
+  useFrame((state) => {
+    if (isFault && groupRef.current) {
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 5) * 0.2;
+      groupRef.current.scale.setScalar(scale);
+    } else if (groupRef.current) {
+      groupRef.current.scale.setScalar(1);
+    }
+  });
+
+  return <group ref={groupRef}>{children}</group>;
+}
 
 function BuildingShell({ opacity = 0.3 }) {
   const floors = React.useMemo(() => new Array(5).fill(0), []);
@@ -241,42 +257,54 @@ export default function BuildingModel({
       {/* EV stations */}
       {showEV && evPositions.map((p, i) => (
         <group key={`ev-${i}`} position={p.toArray()}>
-          <EVCharger color={0x1abc9c} label={`EV-${String(i + 1).padStart(2, '0')}`} indicator={evIndicators[i] || 'normal'} />
+          <AnimatedGroup isFault={evIndicators[i] === 'fault' || evIndicators[i] === 'fuseDrop'}>
+            <EVCharger color={0x1abc9c} label={`EV-${String(i + 1).padStart(2, '0')}`} indicator={evIndicators[i] || 'normal'} />
+          </AnimatedGroup>
         </group>
       ))}
 
       {/* Chillers */}
       {showChiller && chillerPositions.map((p, i) => (
-        <group key={`chiller-${i}`} position={p.toArray()} scale={chillerIndicators[i] === 'fault' ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-          <Chiller />
+        <group key={`chiller-${i}`} position={p.toArray()}>
+          <AnimatedGroup isFault={chillerIndicators[i] === 'fault'}>
+            <Chiller />
+          </AnimatedGroup>
         </group>
       ))}
 
       {/* AHUs */}
       {showAHU && ahuPositions.map((p, i) => (
-        <group key={`ahu-${i}`} position={p.toArray()} scale={ahuIndicators[i] === 'fault' ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-          <AHU />
+        <group key={`ahu-${i}`} position={p.toArray()}>
+          <AnimatedGroup isFault={ahuIndicators[i] === 'fault'}>
+            <AHU />
+          </AnimatedGroup>
         </group>
       ))}
 
       {/* Electrical panels */}
       {showElectrical && electricalPositions.map((p, i) => (
-        <group key={`electrical-${i}`} position={p.toArray()} scale={electricalIndicators[i] === 'fault' ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-          <ElectricalPanel />
+        <group key={`electrical-${i}`} position={p.toArray()}>
+          <AnimatedGroup isFault={electricalIndicators[i] === 'fault'}>
+            <ElectricalPanel />
+          </AnimatedGroup>
         </group>
       ))}
 
       {/* Water pumps */}
       {showPump && pumpPositions.map((p, i) => (
-        <group key={`pump-${i}`} position={p.toArray()} scale={pumpIndicators[i] === 'fault' ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-          <WaterPump />
+        <group key={`pump-${i}`} position={p.toArray()}>
+          <AnimatedGroup isFault={pumpIndicators[i] === 'fault'}>
+            <WaterPump />
+          </AnimatedGroup>
         </group>
       ))}
 
       {/* Fire alarms */}
       {showFire && firePositions.map((p, i) => (
-        <group key={`fire-${i}`} position={p.toArray()} scale={fireIndicators[i] === 'fault' ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-          <FireAlarm />
+        <group key={`fire-${i}`} position={p.toArray()}>
+          <AnimatedGroup isFault={fireIndicators[i] === 'fault'}>
+            <FireAlarm />
+          </AnimatedGroup>
         </group>
       ))}
     </group>

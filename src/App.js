@@ -753,27 +753,27 @@ function App() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <button onClick={toggleChillerPanel} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
+                <span className={chillerIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
               </button>
               <button onClick={toggleAhuPanel} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>AHU Units (12)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={ahuIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
               <button onClick={toggleElectricalPanel} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Electrical Panel (8)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={electricalIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
               <button onClick={togglePumpPanel} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Water Pump System (6)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={pumpIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
               <button onClick={toggleFirePanel} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Fire Alarm System (15)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={fireIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
               <button onClick={openEVPanel} style={{ background: evPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>EV Charging Stations (30)</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={evStations.some(s => s.status === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
             </div>
           </DraggablePanel>
