@@ -664,11 +664,11 @@ function App() {
 
         {/* Bottom-left dock buttons (dark/compact) */}
         <div style={{ position: 'absolute', bottom: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
-          <button title="Sidebar" onClick={toggleSidebar} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
-          <button title="Floors" onClick={toggleFloors} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
-          <button title="Equipment Overview" onClick={toggleEquipmentOverview} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
-          <button title="Filter" onClick={toggleFilter} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
-          <button title="EV Panel" onClick={toggleEV} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
+          <button title="Sidebar" onClick={toggleSidebar} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
+          <button title="Floors" onClick={toggleFloors} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
+          <button title="Equipment Overview" onClick={toggleEquipmentOverview} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
+          <button title="Filter" onClick={toggleFilter} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
+          <button title="EV Panel" onClick={toggleEV} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
         </div>
 
         {/* Bottom-right dock for Accident */}
@@ -751,27 +751,27 @@ function App() {
         {equipmentOverviewVisible && (
           <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <button onClick={toggleChillerPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleChillerPanel} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
               </button>
-              <button onClick={toggleAhuPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleAhuPanel} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>AHU Units (12)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleElectricalPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleElectricalPanel} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Electrical Panel (8)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={togglePumpPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={togglePumpPanel} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Water Pump System (6)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleFirePanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleFirePanel} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Fire Alarm System (15)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={openEVPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={openEVPanel} style={{ background: evPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>EV Charging Stations (30)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
