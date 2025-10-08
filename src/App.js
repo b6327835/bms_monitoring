@@ -41,10 +41,14 @@ function App() {
     ev: false,
     sidebar: false,
     filter: false,
-    equipment: false,
     accident: false,
     floors: false,
-    equipmentOverview: false
+    equipmentOverview: false,
+    chillerPanel: false,
+    ahuPanel: false,
+    electricalPanel: false,
+    pumpPanel: false,
+    firePanel: false
   });
 
   const [evPanelOpen, setEvPanelOpen] = useState(false);
@@ -63,10 +67,21 @@ function App() {
   const [equipmentOverviewVisible, setEquipmentOverviewVisible] = useState(false);
   const [equipmentOverviewMin, setEquipmentOverviewMin] = useState(false);
   const [equipmentOverviewPos, setEquipmentOverviewPos] = useState({ x: 260, y: 250 });
-  const [equipmentPanelOpen, setEquipmentPanelOpen] = useState(false);
-  const [equipmentPanelType, setEquipmentPanelType] = useState('chiller');
-  const [equipmentPanelMin, setEquipmentPanelMin] = useState(false);
-  const [equipmentPanelPos, setEquipmentPanelPos] = useState({ x: 320, y: 480 });
+  const [chillerPanelOpen, setChillerPanelOpen] = useState(false);
+  const [chillerPanelMin, setChillerPanelMin] = useState(false);
+  const [chillerPanelPos, setChillerPanelPos] = useState({ x: 320, y: 480 });
+  const [ahuPanelOpen, setAhuPanelOpen] = useState(false);
+  const [ahuPanelMin, setAhuPanelMin] = useState(false);
+  const [ahuPanelPos, setAhuPanelPos] = useState({ x: 350, y: 480 });
+  const [electricalPanelOpen, setElectricalPanelOpen] = useState(false);
+  const [electricalPanelMin, setElectricalPanelMin] = useState(false);
+  const [electricalPanelPos, setElectricalPanelPos] = useState({ x: 380, y: 480 });
+  const [pumpPanelOpen, setPumpPanelOpen] = useState(false);
+  const [pumpPanelMin, setPumpPanelMin] = useState(false);
+  const [pumpPanelPos, setPumpPanelPos] = useState({ x: 410, y: 480 });
+  const [firePanelOpen, setFirePanelOpen] = useState(false);
+  const [firePanelMin, setFirePanelMin] = useState(false);
+  const [firePanelPos, setFirePanelPos] = useState({ x: 440, y: 480 });
 
   const [evStations, setEvStations] = useState(() => {
     // Seed 30 stations similar to the reference
@@ -130,10 +145,14 @@ function App() {
     accident: 0,
     sidebar: 0,
     filter: 0,
-    equipment: 0,
     ev: 0,
     floors: 0,
-    equipmentOverview: 0
+    equipmentOverview: 0,
+    chillerPanel: 0,
+    ahuPanel: 0,
+    electricalPanel: 0,
+    pumpPanel: 0,
+    firePanel: 0
   });
 
   // Calculate smart position for new panels
@@ -150,14 +169,26 @@ function App() {
     if ((filterVisible || filterMin) && panelId !== 'filter') {
       openPanels.push({ ...filterPos, width: 180, height: 60 });
     }
-    if ((equipmentPanelOpen || equipmentPanelMin) && panelId !== 'equipment') {
-      openPanels.push({ ...equipmentPanelPos, width: 480, height: 60 });
-    }
     if ((floorsVisible || floorsMin) && panelId !== 'floors') {
       openPanels.push({ ...floorsPos, width: 220, height: 60 });
     }
     if ((equipmentOverviewVisible || equipmentOverviewMin) && panelId !== 'equipmentOverview') {
       openPanels.push({ ...equipmentOverviewPos, width: 230, height: 60 });
+    }
+    if ((chillerPanelOpen || chillerPanelMin) && panelId !== 'chillerPanel') {
+      openPanels.push({ ...chillerPanelPos, width: 480, height: 60 });
+    }
+    if ((ahuPanelOpen || ahuPanelMin) && panelId !== 'ahuPanel') {
+      openPanels.push({ ...ahuPanelPos, width: 480, height: 60 });
+    }
+    if ((electricalPanelOpen || electricalPanelMin) && panelId !== 'electricalPanel') {
+      openPanels.push({ ...electricalPanelPos, width: 480, height: 60 });
+    }
+    if ((pumpPanelOpen || pumpPanelMin) && panelId !== 'pumpPanel') {
+      openPanels.push({ ...pumpPanelPos, width: 480, height: 60 });
+    }
+    if ((firePanelOpen || firePanelMin) && panelId !== 'firePanel') {
+      openPanels.push({ ...firePanelPos, width: 480, height: 60 });
     }
     if ((accidentOpen || accidentMin) && panelId !== 'accident') {
       openPanels.push({ ...accidentPos, width: 200, height: 60 });
@@ -196,19 +227,11 @@ function App() {
     
     return { x: bestX, y: bestY };
   }, [evPanelOpen, evPanelMin, evPanelPos, sidebarVisible, sidebarMin, sidebarPos, 
-      filterVisible, filterMin, filterPos, equipmentPanelOpen, equipmentPanelMin, 
-      equipmentPanelPos, accidentOpen, accidentMin, accidentPos]);
+      filterVisible, filterMin, filterPos, accidentOpen, accidentMin, accidentPos, chillerPanelOpen, 
+      chillerPanelMin, chillerPanelPos, ahuPanelOpen, ahuPanelMin, ahuPanelPos, 
+      electricalPanelOpen, electricalPanelMin, electricalPanelPos, pumpPanelOpen, 
+      pumpPanelMin, pumpPanelPos, firePanelOpen, firePanelMin, firePanelPos]);
 
-  // Helper to open equipment panel with smart positioning
-  const openEquipmentPanel = useCallback((type) => {
-    setEquipmentPanelType(type);
-    if (!equipmentPanelOpen && !panelOpenedBefore.current.equipment) {
-      const pos = getSmartPosition('equipment', 480);
-      setEquipmentPanelPos(pos);
-      panelOpenedBefore.current.equipment = true;
-    }
-    setEquipmentPanelOpen(true);
-  }, [equipmentPanelOpen, getSmartPosition]);
 
   // Helper to open EV panel with smart positioning
   const openEVPanel = useCallback(() => {
@@ -260,6 +283,61 @@ function App() {
         const pos = getSmartPosition('equipmentOverview', 230);
         setEquipmentOverviewPos(pos);
         panelOpenedBefore.current.equipmentOverview = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const toggleChillerPanel = useCallback(() => {
+    setChillerPanelOpen((v) => {
+      if (!v && !panelOpenedBefore.current.chillerPanel) {
+        const pos = getSmartPosition('chillerPanel', 480);
+        setChillerPanelPos(pos);
+        panelOpenedBefore.current.chillerPanel = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const toggleAhuPanel = useCallback(() => {
+    setAhuPanelOpen((v) => {
+      if (!v && !panelOpenedBefore.current.ahuPanel) {
+        const pos = getSmartPosition('ahuPanel', 480);
+        setAhuPanelPos(pos);
+        panelOpenedBefore.current.ahuPanel = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const toggleElectricalPanel = useCallback(() => {
+    setElectricalPanelOpen((v) => {
+      if (!v && !panelOpenedBefore.current.electricalPanel) {
+        const pos = getSmartPosition('electricalPanel', 480);
+        setElectricalPanelPos(pos);
+        panelOpenedBefore.current.electricalPanel = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const togglePumpPanel = useCallback(() => {
+    setPumpPanelOpen((v) => {
+      if (!v && !panelOpenedBefore.current.pumpPanel) {
+        const pos = getSmartPosition('pumpPanel', 480);
+        setPumpPanelPos(pos);
+        panelOpenedBefore.current.pumpPanel = true;
+      }
+      return !v;
+    });
+  }, [getSmartPosition]);
+
+  const toggleFirePanel = useCallback(() => {
+    setFirePanelOpen((v) => {
+      if (!v && !panelOpenedBefore.current.firePanel) {
+        const pos = getSmartPosition('firePanel', 480);
+        setFirePanelPos(pos);
+        panelOpenedBefore.current.firePanel = true;
       }
       return !v;
     });
@@ -345,10 +423,14 @@ function App() {
   const closeAccident = useCallback(() => setAccidentOpen(false), []);
   const closeSidebar = useCallback(() => setSidebarVisible(false), []);
   const closeFilter = useCallback(() => setFilterVisible(false), []);
-  const closeEquipment = useCallback(() => setEquipmentPanelOpen(false), []);
   const closeEV = useCallback(() => setEvPanelOpen(false), []);
   const closeFloors = useCallback(() => setFloorsVisible(false), []);
   const closeEquipmentOverview = useCallback(() => setEquipmentOverviewVisible(false), []);
+  const closeChillerPanel = useCallback(() => setChillerPanelOpen(false), []);
+  const closeAhuPanel = useCallback(() => setAhuPanelOpen(false), []);
+  const closeElectricalPanel = useCallback(() => setElectricalPanelOpen(false), []);
+  const closePumpPanel = useCallback(() => setPumpPanelOpen(false), []);
+  const closeFirePanel = useCallback(() => setFirePanelOpen(false), []);
 
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type });
@@ -669,23 +751,23 @@ function App() {
         {equipmentOverviewVisible && (
           <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <button onClick={() => openEquipmentPanel('chiller')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleChillerPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
               </button>
-              <button onClick={() => openEquipmentPanel('ahu')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleAhuPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>AHU Units (12)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={() => openEquipmentPanel('electrical')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleElectricalPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Electrical Panel (8)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={() => openEquipmentPanel('pump')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={togglePumpPanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Water Pump System (6)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={() => openEquipmentPanel('fire')} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleFirePanel} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Fire Alarm System (15)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
@@ -693,6 +775,76 @@ function App() {
                 <span style={{ fontWeight: 700 }}>EV Charging Stations (30)</span>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
+            </div>
+          </DraggablePanel>
+        )}
+
+        {/* Chiller panel (draggable) */}
+        {chillerPanelOpen && (
+          <DraggablePanel panelId="chillerPanel" title="Chiller System" position={chillerPanelPos} setPosition={setChillerPanelPos} minimized={chillerPanelMin} setMinimized={setChillerPanelMin} onClose={closeChillerPanel} width={480}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>7.2 °C</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>4.2 Bar</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>45.8 kW</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>High temp</div></div>
+            </div>
+          </DraggablePanel>
+        )}
+
+        {/* AHU panel (draggable) */}
+        {ahuPanelOpen && (
+          <DraggablePanel panelId="ahuPanel" title="AHU Units" position={ahuPanelPos} setPosition={setAhuPanelPos} minimized={ahuPanelMin} setMinimized={setAhuPanelMin} onClose={closeAhuPanel} width={480}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>22.5 °C</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>1.8 Bar</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>12.3 kW</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            </div>
+          </DraggablePanel>
+        )}
+
+        {/* Electrical panel (draggable) */}
+        {electricalPanelOpen && (
+          <DraggablePanel panelId="electricalPanel" title="Electrical Panel" position={electricalPanelPos} setPosition={setElectricalPanelPos} minimized={electricalPanelMin} setMinimized={setElectricalPanelMin} onClose={closeElectricalPanel} width={480}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>35.2 °C</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>N/A</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>245.8 kW</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>Continuous</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            </div>
+          </DraggablePanel>
+        )}
+
+        {/* Pump panel (draggable) */}
+        {pumpPanelOpen && (
+          <DraggablePanel panelId="pumpPanel" title="Water Pump System" position={pumpPanelPos} setPosition={setPumpPanelPos} minimized={pumpPanelMin} setMinimized={setPumpPanelMin} onClose={closePumpPanel} width={480}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>8.7 °C</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>3.5 Bar</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>8.7 kW</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            </div>
+          </DraggablePanel>
+        )}
+
+        {/* Fire panel (draggable) */}
+        {firePanelOpen && (
+          <DraggablePanel panelId="firePanel" title="Fire Alarm System" position={firePanelPos} setPosition={setFirePanelPos} minimized={firePanelMin} setMinimized={setFirePanelMin} onClose={closeFirePanel} width={480}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>N/A</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>N/A</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>0.5 kW</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>Continuous</div></div>
+              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>Anomaly Zone 2</div></div>
             </div>
           </DraggablePanel>
         )}
@@ -710,21 +862,6 @@ function App() {
           </DraggablePanel>
         )}
 
-        {/* Equipment details panel (draggable) */}
-        {equipmentPanelOpen && (
-          <DraggablePanel panelId="equipment" title={(equipmentPanelType === 'chiller' ? 'Chiller System' : equipmentPanelType === 'ahu' ? 'AHU Units' : equipmentPanelType === 'electrical' ? 'Electrical Panel' : equipmentPanelType === 'pump' ? 'Water Pump System' : equipmentPanelType === 'fire' ? 'Fire Alarm System' : 'EV Charging Stations')} position={equipmentPanelPos} setPosition={setEquipmentPanelPos} minimized={equipmentPanelMin} setMinimized={setEquipmentPanelMin} onClose={closeEquipment} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>{equipmentPanelType === 'chiller' ? '7.2 °C' : equipmentPanelType === 'ahu' ? '22.5 °C' : equipmentPanelType === 'electrical' ? '35.2 °C' : equipmentPanelType === 'pump' ? '8.7 °C' : 'N/A'}</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>{equipmentPanelType === 'chiller' ? '4.2 Bar' : equipmentPanelType === 'ahu' ? '1.8 Bar' : equipmentPanelType === 'pump' ? '3.5 Bar' : 'N/A'}</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>{equipmentPanelType === 'electrical' ? '245.8 kW' : equipmentPanelType === 'chiller' ? '45.8 kW' : equipmentPanelType === 'ahu' ? '12.3 kW' : equipmentPanelType === 'pump' ? '8.7 kW' : '0.5 kW'}</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>{equipmentPanelType === 'electrical' || equipmentPanelType === 'fire' ? 'Continuous' : '1,248 h'}</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>{equipmentPanelType === 'chiller' ? 'High temp' : equipmentPanelType === 'fire' ? 'Anomaly Zone 2' : 'None'}</div></div>
-            </div>
-          </DraggablePanel>
-        )}
-
-        {/* EV Panel (draggable) */}
         {evPanelOpen && (
           <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: 8 }}>
