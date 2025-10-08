@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import BuildingModel from './components/BuildingModel';
 import React, { useState, useMemo, useCallback } from 'react';
 import Draggable from 'react-draggable';
+import commitHash from './version';
 
 function OffscreenClock() {
   const spanRef = React.useRef(null);
@@ -609,9 +610,12 @@ function App() {
     <div className="App">
       <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
         {/* Small top-left title and datetime */}
-        <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 8, display: 'flex', gap: 6 }}>
-          <div style={{ fontWeight: 600 }}>3D Building Simulation - BMS Monitoring (WIP)</div>
-          <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
+        <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 8 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ fontWeight: 600 }}>3D Building Simulation - BMS Monitoring (WIP)</div>
+            <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
+          </div>
+          <div style={{ opacity: 0.8 }}>{commitHash.slice(0,7)}</div>
         </div>
 
         {/* Camera Controls - Vertical Dock (Top Right) */}
