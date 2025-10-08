@@ -250,6 +250,17 @@ function App() {
       }
     };
     
+    // Prevent drag when clicking buttons
+    const handleMinimize = (e) => {
+      e.stopPropagation();
+      setMinimized(!minimized);
+    };
+    
+    const handleClose = (e) => {
+      e.stopPropagation();
+      onClose();
+    };
+    
     return (
       <Draggable
         nodeRef={nodeRef}
@@ -261,8 +272,8 @@ function App() {
           <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', background: '#111827', cursor: 'move', borderBottom: '1px solid #1f2937', userSelect: 'none' }}>
             <div style={{ fontWeight: 800, fontSize: 12, letterSpacing: 0.3 }}>{title}</div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button title={minimized ? 'Expand' : 'Minimize'} onClick={() => setMinimized(!minimized)} style={{ border: '1px solid #374151', background: '#1f2937', color: '#e5e7eb', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}>{minimized ? '▢' : '▁'}</button>
-              <button title="Close" onClick={onClose} style={{ border: '1px solid #7f1d1d', background: '#b91c1c', color: 'white', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}>✕</button>
+              <button title={minimized ? 'Expand' : 'Minimize'} onClick={handleMinimize} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #374151', background: '#1f2937', color: '#e5e7eb', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}>{minimized ? '▢' : '▁'}</button>
+              <button title="Close" onClick={handleClose} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #7f1d1d', background: '#b91c1c', color: 'white', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}>✕</button>
             </div>
           </div>
           <div 
