@@ -498,8 +498,8 @@ function App() {
     <div className="App">
       <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
         {/* Small top-left title and datetime */}
-        <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 12, display: 'flex', gap: 10 }}>
-          <div style={{ fontWeight: 700 }}>3D Building Simulation - BMS Monitoring</div>
+        <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 8, display: 'flex', gap: 6 }}>
+          <div style={{ fontWeight: 600 }}>3D Building Simulation - BMS Monitoring (WIP)</div>
           <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
         </div>
 
