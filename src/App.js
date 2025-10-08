@@ -376,6 +376,9 @@ function App() {
     const nodeRef = React.useRef(null);
     const contentRef = React.useRef(null);
     
+    // Calculate minimized width based on title length
+    const minimizedWidth = minimized ? Math.max(120, title.length * 6 + 60) : width;
+    
     // Restore scroll position BEFORE paint (synchronous)
     React.useLayoutEffect(() => {
       if (contentRef.current && !minimized) {
@@ -411,10 +414,10 @@ function App() {
         onStop={(e, data) => setPosition({ x: data.x, y: data.y })}
         handle=".drag-handle"
       >
-        <div ref={nodeRef} style={{ position: 'absolute', width, background: 'rgba(17,24,39,0.95)', color: '#e5e7eb', borderRadius: 6, boxShadow: '0 8px 20px rgba(0,0,0,0.4)', border: '1px solid #1f2937', zIndex: 3, overflow: 'hidden', fontSize: 11 }}>
-          <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', background: '#111827', cursor: 'move', borderBottom: '1px solid #1f2937', userSelect: 'none' }}>
-            <div style={{ fontWeight: 700, fontSize: 10, letterSpacing: 0.2 }}>{title}</div>
-            <div style={{ display: 'flex', gap: 4 }}>
+        <div ref={nodeRef} style={{ position: 'absolute', width: minimizedWidth, background: 'rgba(17,24,39,0.95)', color: '#e5e7eb', borderRadius: 6, boxShadow: '0 8px 20px rgba(0,0,0,0.4)', border: '1px solid #1f2937', zIndex: 3, overflow: 'hidden', fontSize: 11, transition: 'width 0.2s ease' }}>
+          <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', background: '#111827', cursor: 'move', borderBottom: minimized ? 'none' : '1px solid #1f2937', userSelect: 'none' }}>
+            <div style={{ fontWeight: 700, fontSize: 10, letterSpacing: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+            <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
               <button title={minimized ? 'Expand' : 'Minimize'} onClick={handleMinimize} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #374151', background: '#1f2937', color: '#e5e7eb', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>{minimized ? '▢' : '▁'}</button>
               <button title="Close" onClick={handleClose} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #7f1d1d', background: '#b91c1c', color: 'white', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>✕</button>
             </div>
