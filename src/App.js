@@ -129,17 +129,63 @@ function App() {
   const [accidentMin, setAccidentMin] = useState(false);
   const [accidentPos, setAccidentPos] = useState({ x: window.innerWidth - 320, y: window.innerHeight - 420 });
 
-  // Non-EV equipment accident indicators
-  const CHILLER_COUNT = 3;
-  const AHU_COUNT = 12;
-  const ELECTRICAL_COUNT = 8;
-  const PUMP_COUNT = 6;
-  const FIRE_COUNT = 15;
-  const [chillerIndicators, setChillerIndicators] = useState(Array(CHILLER_COUNT).fill('normal'));
-  const [ahuIndicators, setAhuIndicators] = useState(Array(AHU_COUNT).fill('normal'));
-  const [electricalIndicators, setElectricalIndicators] = useState(Array(ELECTRICAL_COUNT).fill('normal'));
-  const [pumpIndicators, setPumpIndicators] = useState(Array(PUMP_COUNT).fill('normal'));
-  const [fireIndicators, setFireIndicators] = useState(Array(FIRE_COUNT).fill('normal'));
+  // Non-EV equipment data
+  const [chillers, setChillers] = useState([
+    { id: 1, name: 'Chiller-01', status: 'normal', temp: '7.2 °C', pressure: '4.2 Bar', power: '45.8 kW', runtime: '1,248 h', alert: 'None' },
+    { id: 2, name: 'Chiller-02', status: 'normal', temp: '7.1 °C', pressure: '4.1 Bar', power: '46.0 kW', runtime: '1,250 h', alert: 'None' },
+    { id: 3, name: 'Chiller-03', status: 'fault', temp: '9.5 °C', pressure: '4.5 Bar', power: '48.2 kW', runtime: '1,240 h', alert: 'Overheat' }
+  ]);
+
+  const [ahus, setAhus] = useState(Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    name: `AHU-${String(i + 1).padStart(2, '0')}`,
+    status: i === 5 ? 'fault' : 'normal',
+    temp: (22 + Math.random() * 2).toFixed(1) + ' °C',
+    pressure: (1.5 + Math.random() * 1).toFixed(1) + ' Bar',
+    power: (10 + Math.random() * 5).toFixed(1) + ' kW',
+    runtime: '1,248 h',
+    alert: i === 5 ? 'High pressure' : 'None'
+  })));
+
+  const [electricals, setElectricals] = useState(Array.from({ length: 8 }, (_, i) => ({
+    id: i + 1,
+    name: `Electrical-${String(i + 1).padStart(2, '0')}`,
+    status: 'normal',
+    temp: (30 + Math.random() * 15).toFixed(1) + ' °C',
+    pressure: 'N/A',
+    power: (200 + Math.random() * 100).toFixed(1) + ' kW',
+    runtime: 'Continuous',
+    alert: 'None'
+  })));
+
+  const [pumps, setPumps] = useState(Array.from({ length: 6 }, (_, i) => ({
+    id: i + 1,
+    name: `Pump-${String(i + 1).padStart(2, '0')}`,
+    status: 'normal',
+    temp: (8 + Math.random() * 2).toFixed(1) + ' °C',
+    pressure: (3 + Math.random() * 1).toFixed(1) + ' Bar',
+    power: (8 + Math.random() * 1).toFixed(1) + ' kW',
+    runtime: '1,248 h',
+    alert: 'None'
+  })));
+
+  const [fires, setFires] = useState(Array.from({ length: 15 }, (_, i) => ({
+    id: i + 1,
+    name: `Fire-${String(i + 1).padStart(2, '0')}`,
+    status: i === 7 ? 'fault' : 'normal',
+    temp: 'N/A',
+    pressure: 'N/A',
+    power: '0.5 kW',
+    runtime: 'Continuous',
+    alert: i === 7 ? 'Sensor failure' : 'None'
+  })));
+
+  // Derived indicators
+  const chillerIndicators = useMemo(() => chillers.map(c => c.status === 'fault' ? 'fault' : 'normal'), [chillers]);
+  const ahuIndicators = useMemo(() => ahus.map(a => a.status === 'fault' ? 'fault' : 'normal'), [ahus]);
+  const electricalIndicators = useMemo(() => electricals.map(e => e.status === 'fault' ? 'fault' : 'normal'), [electricals]);
+  const pumpIndicators = useMemo(() => pumps.map(p => p.status === 'fault' ? 'fault' : 'normal'), [pumps]);
+  const fireIndicators = useMemo(() => fires.map(f => f.status === 'fault' ? 'fault' : 'normal'), [fires]);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
@@ -465,32 +511,38 @@ function App() {
       return;
     }
 
+    const updateMap = {
+      chiller: (prev, idx) => prev.map((c, i) => i === idx ? { ...c, status: 'fault', alert: 'System failure' } : c),
+      ahu: (prev, idx) => prev.map((a, i) => i === idx ? { ...a, status: 'fault', alert: 'Fan malfunction' } : a),
+      electrical: (prev, idx) => prev.map((e, i) => i === idx ? { ...e, status: 'fault', alert: 'Overload' } : e),
+      pump: (prev, idx) => prev.map((p, i) => i === idx ? { ...p, status: 'fault', alert: 'Motor failure' } : p),
+      fire: (prev, idx) => prev.map((f, i) => i === idx ? { ...f, status: 'fault', alert: 'Sensor error' } : f)
+    };
+
     const setMap = {
-      chiller: setChillerIndicators,
-      ahu: setAhuIndicators,
-      electrical: setElectricalIndicators,
-      pump: setPumpIndicators,
-      fire: setFireIndicators
+      chiller: setChillers,
+      ahu: setAhus,
+      electrical: setElectricals,
+      pump: setPumps,
+      fire: setFires
     };
+
     const currentMap = {
-      chiller: chillerIndicators,
-      ahu: ahuIndicators,
-      electrical: electricalIndicators,
-      pump: pumpIndicators,
-      fire: fireIndicators
+      chiller: chillers,
+      ahu: ahus,
+      electrical: electricals,
+      pump: pumps,
+      fire: fires
     };
+
     const arr = currentMap[type];
     const normals = arr
       .map((v, i) => ({ v, i }))
-      .filter(({ v }) => v === 'normal')
+      .filter(({ v }) => v.status === 'normal')
       .map(({ i }) => i);
     if (normals.length === 0) return;
     const idx = normals[Math.floor(Math.random() * normals.length)];
-    setMap[type]((prev) => {
-      const next = prev.slice();
-      next[idx] = 'fault';
-      return next;
-    });
+    setMap[type]((prev) => updateMap[type](prev, idx));
     showToast(`${type.toUpperCase()} ${idx + 1}: Accident occurred`, 'danger');
   }
 
@@ -534,11 +586,11 @@ function App() {
         voltage: { ...s.voltage, v1: fixedV1, average: avg }
       };
     }));
-    setChillerIndicators(Array(CHILLER_COUNT).fill('normal'));
-    setAhuIndicators(Array(AHU_COUNT).fill('normal'));
-    setElectricalIndicators(Array(ELECTRICAL_COUNT).fill('normal'));
-    setPumpIndicators(Array(PUMP_COUNT).fill('normal'));
-    setFireIndicators(Array(FIRE_COUNT).fill('normal'));
+    setChillers((prev) => prev.map(c => ({ ...c, status: 'normal', alert: 'None' })));
+    setAhus((prev) => prev.map(a => ({ ...a, status: 'normal', alert: 'None' })));
+    setElectricals((prev) => prev.map(e => ({ ...e, status: 'normal', alert: 'None' })));
+    setPumps((prev) => prev.map(p => ({ ...p, status: 'normal', alert: 'None' })));
+    setFires((prev) => prev.map(f => ({ ...f, status: 'normal', alert: 'None' })));
     showToast('All accidents fixed', 'success');
   }
 
@@ -786,13 +838,27 @@ function App() {
         {/* Chiller panel (draggable) */}
         {chillerPanelOpen && (
           <DraggablePanel panelId="chillerPanel" title="Chiller System" position={chillerPanelPos} setPosition={setChillerPanelPos} minimized={chillerPanelMin} setMinimized={setChillerPanelMin} onClose={closeChillerPanel} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>7.2 °C</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>4.2 Bar</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>45.8 kW</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>High temp</div></div>
+            <div>
+              {chillers.map((chiller) => {
+                const statusColor = chiller.status === 'fault' ? '#ef4444' : '#10b981';
+                const statusText = chiller.status.charAt(0).toUpperCase() + chiller.status.slice(1);
+                return (
+                  <div key={chiller.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: 700 }}>{chiller.name}</div>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                      <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{chiller.temp}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{chiller.pressure}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{chiller.power}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{chiller.runtime}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{chiller.alert}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DraggablePanel>
         )}
@@ -800,13 +866,27 @@ function App() {
         {/* AHU panel (draggable) */}
         {ahuPanelOpen && (
           <DraggablePanel panelId="ahuPanel" title="AHU Units" position={ahuPanelPos} setPosition={setAhuPanelPos} minimized={ahuPanelMin} setMinimized={setAhuPanelMin} onClose={closeAhuPanel} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>22.5 °C</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>1.8 Bar</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>12.3 kW</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            <div>
+              {ahus.map((ahu) => {
+                const statusColor = ahu.status === 'fault' ? '#ef4444' : '#10b981';
+                const statusText = ahu.status.charAt(0).toUpperCase() + ahu.status.slice(1);
+                return (
+                  <div key={ahu.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: 700 }}>{ahu.name}</div>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                      <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{ahu.temp}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{ahu.pressure}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{ahu.power}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{ahu.runtime}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{ahu.alert}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DraggablePanel>
         )}
@@ -814,13 +894,27 @@ function App() {
         {/* Electrical panel (draggable) */}
         {electricalPanelOpen && (
           <DraggablePanel panelId="electricalPanel" title="Electrical Panel" position={electricalPanelPos} setPosition={setElectricalPanelPos} minimized={electricalPanelMin} setMinimized={setElectricalPanelMin} onClose={closeElectricalPanel} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>35.2 °C</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>N/A</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>245.8 kW</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>Continuous</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            <div>
+              {electricals.map((electrical) => {
+                const statusColor = electrical.status === 'fault' ? '#ef4444' : '#10b981';
+                const statusText = electrical.status.charAt(0).toUpperCase() + electrical.status.slice(1);
+                return (
+                  <div key={electrical.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: 700 }}>{electrical.name}</div>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                      <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{electrical.temp}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{electrical.pressure}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{electrical.power}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{electrical.runtime}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{electrical.alert}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DraggablePanel>
         )}
@@ -828,13 +922,27 @@ function App() {
         {/* Pump panel (draggable) */}
         {pumpPanelOpen && (
           <DraggablePanel panelId="pumpPanel" title="Water Pump System" position={pumpPanelPos} setPosition={setPumpPanelPos} minimized={pumpPanelMin} setMinimized={setPumpPanelMin} onClose={closePumpPanel} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>8.7 °C</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>3.5 Bar</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>8.7 kW</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>1,248 h</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>None</div></div>
+            <div>
+              {pumps.map((pump) => {
+                const statusColor = pump.status === 'fault' ? '#ef4444' : '#10b981';
+                const statusText = pump.status.charAt(0).toUpperCase() + pump.status.slice(1);
+                return (
+                  <div key={pump.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: 700 }}>{pump.name}</div>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                      <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{pump.temp}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{pump.pressure}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{pump.power}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{pump.runtime}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{pump.alert}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DraggablePanel>
         )}
@@ -842,13 +950,27 @@ function App() {
         {/* Fire panel (draggable) */}
         {firePanelOpen && (
           <DraggablePanel panelId="firePanel" title="Fire Alarm System" position={firePanelPos} setPosition={setFirePanelPos} minimized={firePanelMin} setMinimized={setFirePanelMin} onClose={closeFirePanel} width={480}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Status</div><div style={{ fontWeight: 800 }}>Normal</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Temp</div><div style={{ fontWeight: 800 }}>N/A</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Pressure</div><div style={{ fontWeight: 800 }}>N/A</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Power</div><div style={{ fontWeight: 800 }}>0.5 kW</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Runtime</div><div style={{ fontWeight: 800 }}>Continuous</div></div>
-              <div><div style={{ color: '#9ca3af', fontSize: '11px' }}>Latest Alert</div><div style={{ fontWeight: 800 }}>Anomaly Zone 2</div></div>
+            <div>
+              {fires.map((fire) => {
+                const statusColor = fire.status === 'fault' ? '#ef4444' : '#10b981';
+                const statusText = fire.status.charAt(0).toUpperCase() + fire.status.slice(1);
+                return (
+                  <div key={fire.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: 700 }}>{fire.name}</div>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                      <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{fire.temp}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{fire.pressure}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{fire.power}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{fire.runtime}</span></div>
+                      <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{fire.alert}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DraggablePanel>
         )}
