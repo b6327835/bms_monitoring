@@ -1,6 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-import { Box, Cylinder, Sphere, Plane, Text } from '@react-three/drei';
+import { Box, Cylinder, Sphere, Plane, Text, Edges } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
 function AnimatedGroup({ children, isFault }) {
@@ -54,11 +54,14 @@ function BuildingShell({ opacity = 0.3 }) {
   );
 }
 
-function EVCharger({ color = 0x1abc9c, label, indicator = 'normal' }) {
+function EVCharger({ color = 0x1abc9c, label, indicator = 'normal', onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Box args={[1.5, 3, 1]} position={[0, 1.5, 0]} castShadow receiveShadow>
+      <Box args={[1.5, 3, 1]} position={[0, 1.5, 0]} castShadow receiveShadow onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0x333333} />
+        {hovered && <Edges color="white" />}
       </Box>
       <Box args={[1.2, 0.8, 0.1]} position={[0, 2.2, 0.51]}>
         <meshPhongMaterial color={0x000000} emissive={0x111111} />
@@ -79,11 +82,14 @@ function EVCharger({ color = 0x1abc9c, label, indicator = 'normal' }) {
   );
 }
 
-function Chiller({ color = 0x3498db }) {
+function Chiller({ onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Box args={[4, 2.5, 4]} castShadow receiveShadow>
+      <Box args={[4, 2.5, 4]} castShadow receiveShadow onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0xaaaaaa} />
+        {hovered && <Edges color="white" />}
       </Box>
       {new Array(6).fill(0).map((_, i) => (
         <Box key={i} args={[3.5, 0.15, 0.3]} position={[0, -0.9 + i * 0.4, 2.01]}>
@@ -91,17 +97,20 @@ function Chiller({ color = 0x3498db }) {
         </Box>
       ))}
       <Sphere args={[0.2, 16, 16]} position={[1.6, 1, 2.01]}>
-        <meshPhongMaterial color={color} emissive={color} emissiveIntensity={0.3} />
+        <meshPhongMaterial color={0x3498db} emissive={0x3498db} emissiveIntensity={0.3} />
       </Sphere>
     </group>
   );
 }
 
-function AHU({ color = 0x2ecc71 }) {
+function AHU({ onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Box args={[2.5, 2, 2.5]} castShadow receiveShadow>
+      <Box args={[2.5, 2, 2.5]} castShadow receiveShadow onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0xdddddd} />
+        {hovered && <Edges color="white" />}
       </Box>
       <Cylinder args={[0.4, 0.4, 1, 16]} position={[0.9, 0, 0.9]} rotation={[Math.PI / 2, 0, 0]}>
         <meshPhongMaterial color={0x888888} />
@@ -116,11 +125,14 @@ function AHU({ color = 0x2ecc71 }) {
   );
 }
 
-function ElectricalPanel({ color = 0xf39c12 }) {
+function ElectricalPanel({ onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Box args={[2, 2.5, 1.2]} castShadow receiveShadow>
+      <Box args={[2, 2.5, 1.2]} castShadow receiveShadow onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0x222222} />
+        {hovered && <Edges color="white" />}
       </Box>
       <Box args={[1.8, 2.2, 0.05]} position={[0, 0, 0.61]}>
         <meshPhongMaterial color={0x444444} />
@@ -130,18 +142,21 @@ function ElectricalPanel({ color = 0xf39c12 }) {
       </Cylinder>
       {[0, 1, 2].map((i) => (
         <Sphere key={i} args={[0.06, 8, 8]} position={[-0.5, 0.8 - i * 0.3, 0.64]}>
-          <meshPhongMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+          <meshPhongMaterial color={0xf39c12} emissive={0xf39c12} emissiveIntensity={0.5} />
         </Sphere>
       ))}
     </group>
   );
 }
 
-function WaterPump({}) {
+function WaterPump({ onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Cylinder args={[1, 1, 0.3, 16]}>
+      <Cylinder args={[1, 1, 0.3, 16]} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0x666666} />
+        {hovered && <Edges color="white" />}
       </Cylinder>
       <Cylinder args={[0.8, 0.8, 1.2, 16]} position={[0, 0.9, 0]}>
         <meshPhongMaterial color={0xaaaaaa} />
@@ -159,11 +174,14 @@ function WaterPump({}) {
   );
 }
 
-function FireAlarm() {
+function FireAlarm({ onDoubleClick }) {
+  const [hovered, setHovered] = React.useState(false);
+
   return (
     <group>
-      <Cylinder args={[0.5, 0.5, 0.3, 16]}>
+      <Cylinder args={[0.5, 0.5, 0.3, 16]} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onDoubleClick={onDoubleClick}>
         <meshPhongMaterial color={0xff0000} emissive={0x330000} />
+        {hovered && <Edges color="white" />}
       </Cylinder>
       <Sphere args={[0.2, 16, 16]} position={[0, 0.25, 0]}>
         <meshPhongMaterial color={0xffffff} emissive={0xffffff} emissiveIntensity={0.3} />
@@ -190,7 +208,13 @@ export default function BuildingModel({
   ahuIndicators = [],
   electricalIndicators = [],
   pumpIndicators = [],
-  fireIndicators = []
+  fireIndicators = [],
+  onOpenEVPanel,
+  onOpenChillerPanel,
+  onOpenAhuPanel,
+  onOpenElectricalPanel,
+  onOpenPumpPanel,
+  onOpenFirePanel
 }) {
   // Equipment positions replicating the reference
   const evPositions = React.useMemo(() => {
@@ -258,7 +282,7 @@ export default function BuildingModel({
       {showEV && evPositions.map((p, i) => (
         <group key={`ev-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={evIndicators[i] === 'fault' || evIndicators[i] === 'fuseDrop'}>
-            <EVCharger color={0x1abc9c} label={`EV-${String(i + 1).padStart(2, '0')}`} indicator={evIndicators[i] || 'normal'} />
+            <EVCharger color={0x1abc9c} label={`EV-${String(i + 1).padStart(2, '0')}`} indicator={evIndicators[i] || 'normal'} onDoubleClick={() => onOpenEVPanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
@@ -267,7 +291,7 @@ export default function BuildingModel({
       {showChiller && chillerPositions.map((p, i) => (
         <group key={`chiller-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={chillerIndicators[i] === 'fault'}>
-            <Chiller />
+            <Chiller onDoubleClick={() => onOpenChillerPanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
@@ -276,7 +300,7 @@ export default function BuildingModel({
       {showAHU && ahuPositions.map((p, i) => (
         <group key={`ahu-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={ahuIndicators[i] === 'fault'}>
-            <AHU />
+            <AHU onDoubleClick={() => onOpenAhuPanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
@@ -285,7 +309,7 @@ export default function BuildingModel({
       {showElectrical && electricalPositions.map((p, i) => (
         <group key={`electrical-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={electricalIndicators[i] === 'fault'}>
-            <ElectricalPanel />
+            <ElectricalPanel onDoubleClick={() => onOpenElectricalPanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
@@ -294,7 +318,7 @@ export default function BuildingModel({
       {showPump && pumpPositions.map((p, i) => (
         <group key={`pump-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={pumpIndicators[i] === 'fault'}>
-            <WaterPump />
+            <WaterPump onDoubleClick={() => onOpenPumpPanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
@@ -303,7 +327,7 @@ export default function BuildingModel({
       {showFire && firePositions.map((p, i) => (
         <group key={`fire-${i}`} position={p.toArray()}>
           <AnimatedGroup isFault={fireIndicators[i] === 'fault'}>
-            <FireAlarm />
+            <FireAlarm onDoubleClick={() => onOpenFirePanel(i)} />
           </AnimatedGroup>
         </group>
       ))}
