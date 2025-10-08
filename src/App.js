@@ -22,7 +22,7 @@ function OffscreenClock() {
 }
 
 function App() {
-  const [opacity, setOpacity] = useState(1);
+  const [opacity, setOpacity] = useState(0.5);
   const [showBuilding, setShowBuilding] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [showEV, setShowEV] = useState(true);
@@ -36,10 +36,10 @@ function App() {
   const [evPanelMin, setEvPanelMin] = useState(false);
   const [evPanelPos, setEvPanelPos] = useState({ x: window.innerWidth - 540, y: 70 });
 
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [sidebarMin, setSidebarMin] = useState(false);
   const [sidebarPos, setSidebarPos] = useState({ x: 20, y: 70 });
-  const [filterVisible, setFilterVisible] = useState(true);
+  const [filterVisible, setFilterVisible] = useState(false);
   const [filterMin, setFilterMin] = useState(false);
   const [filterPos, setFilterPos] = useState({ x: 320, y: 145 });
   const [equipmentPanelOpen, setEquipmentPanelOpen] = useState(false);
@@ -297,6 +297,35 @@ function App() {
           <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
         </div>
 
+        {/* Transparency slider - above bottom-left dock */}
+        <div style={{
+          position: 'absolute',
+          bottom: '68px',
+          left: '16px',
+          zIndex: 4,
+          background: 'rgba(17,24,39,0.8)',
+          padding: '6px 10px',
+          borderRadius: '8px',
+          border: '1px solid #1f2937',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <label htmlFor="opacity" style={{ color: '#e5e7eb', fontSize: 11, fontWeight: 600 }}>Opacity:</label>
+          <input
+            id="opacity"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={opacity}
+            onChange={(e) => setOpacity(parseFloat(e.target.value))}
+            style={{ width: '100px' }}
+          />
+          <span style={{ color: '#9ca3af', fontSize: 10, minWidth: '30px' }}>{Math.round(opacity * 100)}%</span>
+        </div>
+
         {/* Bottom-left dock buttons (dark/compact) */}
         <div style={{ position: 'absolute', bottom: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
           <button title="Sidebar" onClick={() => setSidebarVisible((v) => !v)} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
@@ -317,32 +346,6 @@ function App() {
           </div>
         )}
 
-        {/* Transparency bar */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 2,
-          background: 'rgba(0, 0, 0, 0.7)',
-          padding: '8px 10px',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <label htmlFor="opacity" style={{ color: 'white', fontSize: 12 }}>Transparency:</label>
-          <input
-            id="opacity"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={opacity}
-            onChange={(e) => setOpacity(parseFloat(e.target.value))}
-            style={{ width: '180px' }}
-          />
-        </div>
 
         {/* Accident Controls Panel (draggable) */}
         {accidentOpen && (
