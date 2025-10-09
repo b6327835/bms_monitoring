@@ -7,6 +7,9 @@ import Draggable from 'react-draggable';
 import commitHash from './version';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires } from './constants/equipmentData';
 import EquipmentOverviewPanels from './components/EquipmentOverviewPanels';
+import IndividualUnitPanels from './components/IndividualUnitPanels';
+import { useEquipmentState } from './hooks/useEquipmentState';
+import { usePanelState } from './hooks/usePanelState';
 
 function OffscreenClock() {
   const spanRef = React.useRef(null);
@@ -34,128 +37,96 @@ function App() {
   const [showElectrical, setShowElectrical] = useState(true);
   const [showPump, setShowPump] = useState(true);
   const [showFire, setShowFire] = useState(true);
-  
+
   // Camera controls
   const cameraControlsRef = React.useRef(null);
   const zoomIntervalRef = React.useRef(null);
-  
-  // Track if panels have been opened before (for overview panels only)
-  const panelOpenedBefore = React.useRef({
-    ev: false,
-    sidebar: false,
-    filter: false,
-    accident: false,
-    floors: false,
-    equipmentOverview: false,
-    chillerPanel: false,
-    ahuPanel: false,
-    electricalPanel: false,
-    pumpPanel: false,
-    firePanel: false
-  });
 
-  const [evPanelOpen, setEvPanelOpen] = useState(false);
-  const [evPanelMin, setEvPanelMin] = useState(false);
-  const [evPanelPos, setEvPanelPos] = useState({ x: window.innerWidth - 540, y: 70 });
+  // Use equipment state hook
+  const {
+    evStations,
+    setEvStations,
+    chillers,
+    setChillers,
+    ahus,
+    setAhus,
+    electricals,
+    setElectricals,
+    pumps,
+    setPumps,
+    fires,
+    setFires,
+    openEVUnits,
+    setOpenEVUnits,
+    openChillerUnits,
+    setOpenChillerUnits,
+    openAhuUnits,
+    setOpenAhuUnits,
+    openElectricalUnits,
+    setOpenElectricalUnits,
+    openPumpUnits,
+    setOpenPumpUnits,
+    openFireUnits,
+    setOpenFireUnits,
+    chillerIndicators,
+    ahuIndicators,
+    electricalIndicators,
+    pumpIndicators,
+    fireIndicators,
+    evSummary,
+    openIndividualEV,
+    openIndividualChiller,
+    openIndividualAhu,
+    openIndividualElectrical,
+    openIndividualPump,
+    openIndividualFire,
+    closeIndividualUnit,
+    handleRandomAccident,
+    handleRandomEVFuseDrop,
+    handleFixAllAccident
+  } = useEquipmentState();
 
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [sidebarMin, setSidebarMin] = useState(false);
-  const [sidebarPos, setSidebarPos] = useState({ x: 20, y: 70 });
-  const [filterVisible, setFilterVisible] = useState(false);
-  const [filterMin, setFilterMin] = useState(false);
-  const [filterPos, setFilterPos] = useState({ x: 320, y: 145 });
-  const [floorsVisible, setFloorsVisible] = useState(false);
-  const [floorsMin, setFloorsMin] = useState(false);
-  const [floorsPos, setFloorsPos] = useState({ x: 20, y: 250 });
-  const [equipmentOverviewVisible, setEquipmentOverviewVisible] = useState(false);
-  const [equipmentOverviewMin, setEquipmentOverviewMin] = useState(false);
-  const [equipmentOverviewPos, setEquipmentOverviewPos] = useState({ x: 260, y: 250 });
-  const [chillerPanelOpen, setChillerPanelOpen] = useState(false);
-  const [chillerPanelMin, setChillerPanelMin] = useState(false);
-  const [chillerPanelPos, setChillerPanelPos] = useState({ x: 320, y: 480 });
-  const [ahuPanelOpen, setAhuPanelOpen] = useState(false);
-  const [ahuPanelMin, setAhuPanelMin] = useState(false);
-  const [ahuPanelPos, setAhuPanelPos] = useState({ x: 350, y: 480 });
-  const [electricalPanelOpen, setElectricalPanelOpen] = useState(false);
-  const [electricalPanelMin, setElectricalPanelMin] = useState(false);
-  const [electricalPanelPos, setElectricalPanelPos] = useState({ x: 380, y: 480 });
-  const [pumpPanelOpen, setPumpPanelOpen] = useState(false);
-  const [pumpPanelMin, setPumpPanelMin] = useState(false);
-  const [pumpPanelPos, setPumpPanelPos] = useState({ x: 410, y: 480 });
-  const [firePanelOpen, setFirePanelOpen] = useState(false);
-  const [firePanelMin, setFirePanelMin] = useState(false);
-  const [firePanelPos, setFirePanelPos] = useState({ x: 440, y: 480 });
+  // Use panel state hook
+  const {
+    chillerPanelOpen, setChillerPanelOpen, chillerPanelMin, setChillerPanelMin, chillerPanelPos, setChillerPanelPos,
+    ahuPanelOpen, setAhuPanelOpen, ahuPanelMin, setAhuPanelMin, ahuPanelPos, setAhuPanelPos,
+    electricalPanelOpen, setElectricalPanelOpen, electricalPanelMin, setElectricalPanelMin, electricalPanelPos, setElectricalPanelPos,
+    pumpPanelOpen, setPumpPanelOpen, pumpPanelMin, setPumpPanelMin, pumpPanelPos, setPumpPanelPos,
+    firePanelOpen, setFirePanelOpen, firePanelMin, setFirePanelMin, firePanelPos, setFirePanelPos,
+    evPanelOpen, setEvPanelOpen, evPanelMin, setEvPanelMin, evPanelPos, setEvPanelPos,
+    sidebarVisible, setSidebarVisible, sidebarMin, setSidebarMin, sidebarPos, setSidebarPos,
+    filterVisible, setFilterVisible, filterMin, setFilterMin, filterPos, setFilterPos,
+    floorsVisible, setFloorsVisible, floorsMin, setFloorsMin, floorsPos, setFloorsPos,
+    equipmentOverviewVisible, setEquipmentOverviewVisible, equipmentOverviewMin, setEquipmentOverviewMin, equipmentOverviewPos, setEquipmentOverviewPos,
+    accidentOpen, setAccidentOpen, accidentMin, setAccidentMin, accidentPos, setAccidentPos,
+    openEVPanel,
+    toggleSidebar,
+    toggleFilter,
+    toggleFloors,
+    toggleEquipmentOverview,
+    toggleChillerPanel,
+    toggleAhuPanel,
+    toggleElectricalPanel,
+    togglePumpPanel,
+    toggleFirePanel,
+    toggleEV,
+    toggleAccident,
+    closeAccident,
+    closeSidebar,
+    closeFilter,
+    closeEV,
+    closeFloors,
+    closeEquipmentOverview,
+    closeChillerPanel,
+    closeAhuPanel,
+    closeElectricalPanel,
+    closePumpPanel,
+    closeFirePanel
+  } = usePanelState();
 
-  // Individual unit panels
-  const [openEVUnits, setOpenEVUnits] = useState({});
-  const [openChillerUnits, setOpenChillerUnits] = useState({});
-  const [openAhuUnits, setOpenAhuUnits] = useState({});
-  const [openElectricalUnits, setOpenElectricalUnits] = useState({});
-  const [openPumpUnits, setOpenPumpUnits] = useState({});
-  const [openFireUnits, setOpenFireUnits] = useState({});
-
-  const [evStations, setEvStations] = useState(() => {
-    // Seed 30 stations similar to the reference
-    const base = [
-      { type: 'Fast Charger', status: 'charging', power: '45.2 kW', usageTime: '1:25:10', temp: '42°C', connector: 'CCS2', voltage: { v1: 228, v2: 230, v3: 229 } },
-      { type: 'Fast Charger', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '28°C', connector: 'CCS2', voltage: { v1: 230, v2: 231, v3: 229 } },
-      { type: 'Standard', status: 'charging', power: '22.5 kW', usageTime: '2:15:45', temp: '38°C', connector: 'Type 2', voltage: { v1: 229, v2: 228, v3: 230 } },
-      { type: 'Standard', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '29°C', connector: 'Type 2', voltage: { v1: 231, v2: 230, v3: 229 } },
-      { type: 'Fast Charger', status: 'charging', power: '48.7 kW', usageTime: '0:45:30', temp: '45°C', connector: 'CCS2', voltage: { v1: 227, v2: 229, v3: 228 } },
-      { type: 'Standard', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '27°C', connector: 'Type 2', voltage: { v1: 230, v2: 231, v3: 230 } },
-    ];
-    const list = new Array(30).fill(0).map((_, i) => {
-      const t = base[i % base.length];
-      const v1 = t.voltage.v1;
-      const v2 = t.voltage.v2;
-      const v3 = t.voltage.v3;
-      const average = Math.round((v1 + v2 + v3) / 3);
-      return {
-        id: i + 1,
-        name: `EV-${String(i + 1).padStart(2, '0')}`,
-        type: t.type,
-        status: i === 12 || i === 22 ? 'fault' : t.status, // inject a couple faults
-        power: t.power,
-        usageTime: t.usageTime,
-        temp: t.temp,
-        connector: t.connector,
-        voltage: { v1, v2, v3, average }
-      };
-    });
-    return list;
-  });
-
-  const evSummary = useMemo(() => {
-    const total = evStations.length;
-    const charging = evStations.filter(s => s.status === 'charging').length;
-    const available = evStations.filter(s => s.status === 'available').length;
-    const fault = evStations.filter(s => s.status === 'fault').length;
-    return { total, charging, available, fault };
-  }, [evStations]);
-
-  const [accidentOpen, setAccidentOpen] = useState(false);
-  const [accidentLock, setAccidentLock] = useState(false);
+  // Toast and accident lock state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const [accidentMin, setAccidentMin] = useState(false);
-  const [accidentPos, setAccidentPos] = useState({ x: window.innerWidth - 320, y: window.innerHeight - 420 });
-
-  // Non-EV equipment data
-  const [chillers, setChillers] = useState(initialChillers);
-
-  const [ahus, setAhus] = useState(initialAhus);
-
-  const [electricals, setElectricals] = useState(initialElectricals);
-
-  const [pumps, setPumps] = useState(initialPumps);
-
-  const [fires, setFires] = useState(initialFires);
-
-  // Derived indicators
-  const chillerIndicators = useMemo(() => chillers.map(c => c.status === 'fault' ? 'fault' : 'normal'), [chillers]);
-  const ahuIndicators = useMemo(() => ahus.map(a => a.status === 'fault' ? 'fault' : 'normal'), [ahus]);
-  const electricalIndicators = useMemo(() => electricals.map(e => e.status === 'fault' ? 'fault' : 'normal'), [electricals]);
-  const pumpIndicators = useMemo(() => pumps.map(p => p.status === 'fault' ? 'fault' : 'normal'), [pumps]);
-  const fireIndicators = useMemo(() => fires.map(f => f.status === 'fault' ? 'fault' : 'normal'), [fires]);
+  const [accidentLock, setAccidentLock] = useState(false);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
@@ -250,137 +221,7 @@ function App() {
       pumpPanelMin, pumpPanelPos, firePanelOpen, firePanelMin, firePanelPos]);
 
 
-  // Helper to open EV panel with smart positioning
-  const openEVPanel = useCallback(() => {
-    if (!evPanelOpen && !panelOpenedBefore.current.ev) {
-      const pos = getSmartPosition('ev', 380);
-      setEvPanelPos(pos);
-      panelOpenedBefore.current.ev = true;
-    }
-    setEvPanelOpen(true);
-  }, [evPanelOpen, getSmartPosition]);
-
-  // Smart toggle handlers for panels
-  const toggleSidebar = useCallback(() => {
-    setSidebarVisible((v) => {
-      if (!v && !panelOpenedBefore.current.sidebar) {
-        const pos = getSmartPosition('sidebar', 220);
-        setSidebarPos(pos);
-        panelOpenedBefore.current.sidebar = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleFilter = useCallback(() => {
-    setFilterVisible((v) => {
-      if (!v && !panelOpenedBefore.current.filter) {
-        const pos = getSmartPosition('filter', 180);
-        setFilterPos(pos);
-        panelOpenedBefore.current.filter = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleFloors = useCallback(() => {
-    setFloorsVisible((v) => {
-      if (!v && !panelOpenedBefore.current.floors) {
-        const pos = getSmartPosition('floors', 220);
-        setFloorsPos(pos);
-        panelOpenedBefore.current.floors = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleEquipmentOverview = useCallback(() => {
-    setEquipmentOverviewVisible((v) => {
-      if (!v && !panelOpenedBefore.current.equipmentOverview) {
-        const pos = getSmartPosition('equipmentOverview', 230);
-        setEquipmentOverviewPos(pos);
-        panelOpenedBefore.current.equipmentOverview = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleChillerPanel = useCallback(() => {
-    setChillerPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.chillerPanel) {
-        const pos = getSmartPosition('chillerPanel', 480);
-        setChillerPanelPos(pos);
-        panelOpenedBefore.current.chillerPanel = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleAhuPanel = useCallback(() => {
-    setAhuPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.ahuPanel) {
-        const pos = getSmartPosition('ahuPanel', 480);
-        setAhuPanelPos(pos);
-        panelOpenedBefore.current.ahuPanel = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleElectricalPanel = useCallback(() => {
-    setElectricalPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.electricalPanel) {
-        const pos = getSmartPosition('electricalPanel', 480);
-        setElectricalPanelPos(pos);
-        panelOpenedBefore.current.electricalPanel = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const togglePumpPanel = useCallback(() => {
-    setPumpPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.pumpPanel) {
-        const pos = getSmartPosition('pumpPanel', 480);
-        setPumpPanelPos(pos);
-        panelOpenedBefore.current.pumpPanel = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleFirePanel = useCallback(() => {
-    setFirePanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.firePanel) {
-        const pos = getSmartPosition('firePanel', 480);
-        setFirePanelPos(pos);
-        panelOpenedBefore.current.firePanel = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleEV = useCallback(() => {
-    setEvPanelOpen((v) => {
-      if (!v && !panelOpenedBefore.current.ev) {
-        const pos = getSmartPosition('ev', 380);
-        setEvPanelPos(pos);
-        panelOpenedBefore.current.ev = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
-
-  const toggleAccident = useCallback(() => {
-    setAccidentOpen((v) => {
-      if (!v && !panelOpenedBefore.current.accident) {
-        const pos = getSmartPosition('accident', 200);
-        setAccidentPos(pos);
-        panelOpenedBefore.current.accident = true;
-      }
-      return !v;
-    });
-  }, [getSmartPosition]);
+  // Helper to open EV panel with smart positioning (now from hook)
 
   // Camera control functions
   const handleCameraHome = useCallback(() => {
@@ -436,236 +277,11 @@ function App() {
     };
   }, []);
 
-  // Memoized callbacks to prevent unnecessary re-renders
-  const closeAccident = useCallback(() => setAccidentOpen(false), []);
-  const closeSidebar = useCallback(() => setSidebarVisible(false), []);
-  const closeFilter = useCallback(() => setFilterVisible(false), []);
-  const closeEV = useCallback(() => setEvPanelOpen(false), []);
-  const closeFloors = useCallback(() => setFloorsVisible(false), []);
-  const closeEquipmentOverview = useCallback(() => setEquipmentOverviewVisible(false), []);
-  const closeChillerPanel = useCallback(() => setChillerPanelOpen(false), []);
-  const closeAhuPanel = useCallback(() => setAhuPanelOpen(false), []);
-  const closeElectricalPanel = useCallback(() => setElectricalPanelOpen(false), []);
-  const closePumpPanel = useCallback(() => setPumpPanelOpen(false), []);
-  const closeFirePanel = useCallback(() => setFirePanelOpen(false), []);
-
-  // Handlers to open individual unit panels
-  const openIndividualEV = useCallback((index) => {
-    const unitId = `ev-${index}`;
-    if (!openEVUnits[unitId]) {
-      setOpenEVUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openEVUnits]);
-
-  const openIndividualChiller = useCallback((index) => {
-    const unitId = `chiller-${index}`;
-    if (!openChillerUnits[unitId]) {
-      setOpenChillerUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openChillerUnits]);
-
-  const openIndividualAhu = useCallback((index) => {
-    const unitId = `ahu-${index}`;
-    if (!openAhuUnits[unitId]) {
-      setOpenAhuUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openAhuUnits]);
-
-  const openIndividualElectrical = useCallback((index) => {
-    const unitId = `electrical-${index}`;
-    if (!openElectricalUnits[unitId]) {
-      setOpenElectricalUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openElectricalUnits]);
-
-  const openIndividualPump = useCallback((index) => {
-    const unitId = `pump-${index}`;
-    if (!openPumpUnits[unitId]) {
-      setOpenPumpUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openPumpUnits]);
-
-  const openIndividualFire = useCallback((index) => {
-    const unitId = `fire-${index}`;
-    if (!openFireUnits[unitId]) {
-      setOpenFireUnits(prev => ({
-        ...prev,
-        [unitId]: {
-          id: unitId,
-          index,
-          position: { x: 100 + Object.keys(prev).length * 30, y: 100 + Object.keys(prev).length * 30 },
-          minimized: false
-        }
-      }));
-    }
-  }, [openFireUnits]);
-
-  const closeIndividualUnit = useCallback((unitId, type) => {
-    if (type === 'ev') {
-      setOpenEVUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    } else if (type === 'chiller') {
-      setOpenChillerUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    } else if (type === 'ahu') {
-      setOpenAhuUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    } else if (type === 'electrical') {
-      setOpenElectricalUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    } else if (type === 'pump') {
-      setOpenPumpUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    } else if (type === 'fire') {
-      setOpenFireUnits(prev => {
-        const next = { ...prev };
-        delete next[unitId];
-        return next;
-      });
-    }
-  }, []);
+  // Memoized callbacks to prevent unnecessary re-renders (now from hook)
 
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type });
     setTimeout(() => setToast({ visible: false, message: '' }), 5000);
-  }
-
-  function pickRandomIndex(filterFn) {
-    const idxs = evStations
-      .map((s, i) => ({ s, i }))
-      .filter(({ s }) => (filterFn ? filterFn(s) : true))
-      .map(({ i }) => i);
-    if (idxs.length === 0) return -1;
-    return idxs[Math.floor(Math.random() * idxs.length)];
-  }
-
-  function handleRandomAccident() {
-    if (accidentLock) return;
-    // Choose a random equipment type
-    const types = ['ev', 'chiller', 'ahu', 'electrical', 'pump', 'fire'];
-    const type = types[Math.floor(Math.random() * types.length)];
-
-    if (type === 'ev') {
-      setEvStations((prev) => {
-        const i = pickRandomIndex((s) => s.status !== 'fault');
-        if (i < 0) return prev;
-        const next = prev.slice();
-        next[i] = { ...next[i], status: 'fault', accidentType: 'fault' };
-        showToast(`${next[i].name}: Accident occurred`, 'danger');
-        return next;
-      });
-      return;
-    }
-
-    const updateMap = {
-      chiller: (prev, idx) => prev.map((c, i) => i === idx ? { ...c, status: 'fault', alert: 'System failure' } : c),
-      ahu: (prev, idx) => prev.map((a, i) => i === idx ? { ...a, status: 'fault', alert: 'Fan malfunction' } : a),
-      electrical: (prev, idx) => prev.map((e, i) => i === idx ? { ...e, status: 'fault', alert: 'Overload' } : e),
-      pump: (prev, idx) => prev.map((p, i) => i === idx ? { ...p, status: 'fault', alert: 'Motor failure' } : p),
-      fire: (prev, idx) => prev.map((f, i) => i === idx ? { ...f, status: 'fault', alert: 'Sensor error' } : f)
-    };
-
-    const setMap = {
-      chiller: setChillers,
-      ahu: setAhus,
-      electrical: setElectricals,
-      pump: setPumps,
-      fire: setFires
-    };
-
-    const currentMap = {
-      chiller: chillers,
-      ahu: ahus,
-      electrical: electricals,
-      pump: pumps,
-      fire: fires
-    };
-
-    const arr = currentMap[type];
-    const normals = arr
-      .map((v, i) => ({ v, i }))
-      .filter(({ v }) => v.status === 'normal')
-      .map(({ i }) => i);
-    if (normals.length === 0) return;
-    const idx = normals[Math.floor(Math.random() * normals.length)];
-    setMap[type]((prev) => updateMap[type](prev, idx));
-    showToast(`${type.toUpperCase()} ${idx + 1}: Accident occurred`, 'danger');
-  }
-
-  function handleRandomEVFuseDrop() {
-    if (accidentLock) return;
-    setEvStations((prev) => {
-      const i = pickRandomIndex(() => true);
-      if (i < 0) return prev;
-      const station = prev[i];
-      const v2 = station.voltage.v2;
-      const v3 = station.voltage.v3;
-      const nextAvg = Math.round((v2 + v3) / 2);
-      const next = prev.slice();
-      next[i] = {
-        ...station,
-        status: 'fault',
-        accidentType: 'fuseDrop',
-        voltage: { ...station.voltage, v1: 0, average: nextAvg }
-      };
-      showToast(`${next[i].name}: Fuse Dropped (V1 = 0V)`, 'warning');
-      return next;
-    });
   }
 
   function handleStopAccident() {
@@ -674,25 +290,6 @@ function App() {
       showToast(next ? 'Accidents locked' : 'Accidents resumed', 'success');
       return next;
     });
-  }
-
-  function handleFixAllAccident() {
-    setEvStations((prev) => prev.map((s) => {
-      const fixedV1 = s.voltage.v1 === 0 ? 230 : s.voltage.v1;
-      const avg = Math.round((fixedV1 + s.voltage.v2 + s.voltage.v3) / 3);
-      return {
-        ...s,
-        status: s.status === 'fault' ? 'available' : s.status,
-        accidentType: undefined,
-        voltage: { ...s.voltage, v1: fixedV1, average: avg }
-      };
-    }));
-    setChillers((prev) => prev.map(c => ({ ...c, status: 'normal', alert: 'None' })));
-    setAhus((prev) => prev.map(a => ({ ...a, status: 'normal', alert: 'None' })));
-    setElectricals((prev) => prev.map(e => ({ ...e, status: 'normal', alert: 'None' })));
-    setPumps((prev) => prev.map(p => ({ ...p, status: 'normal', alert: 'None' })));
-    setFires((prev) => prev.map(f => ({ ...f, status: 'normal', alert: 'None' })));
-    showToast('All accidents fixed', 'success');
   }
 
   const DraggablePanel = React.memo(({ panelId, title, position, setPosition, minimized, setMinimized, onClose, width = 200, children }) => {
@@ -978,225 +575,32 @@ function App() {
           fires={fires}
         />
 
-        {/* Individual EV Unit Panels */}
-        {Object.values(openEVUnits).map((unit) => {
-          const ev = evStations[unit.index];
-          if (!ev) return null;
-          const statusColor = ev.status === 'fault' ? '#ef4444' : ev.status === 'charging' ? '#3b82f6' : '#10b981';
-          const statusText = ev.status.charAt(0).toUpperCase() + ev.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={ev.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenEVUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenEVUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'ev')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{ev.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Type: </span><span style={{ fontWeight: 600 }}>{ev.type}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{ev.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Usage: </span><span style={{ fontWeight: 600 }}>{ev.usageTime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{ev.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Connector: </span><span style={{ fontWeight: 600 }}>{ev.connector}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>V1: </span><span style={{ fontWeight: 600 }}>{ev.voltage.v1}V</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>V2: </span><span style={{ fontWeight: 600 }}>{ev.voltage.v2}V</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>V3: </span><span style={{ fontWeight: 600 }}>{ev.voltage.v3}V</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Avg: </span><span style={{ fontWeight: 600 }}>{ev.voltage.average}V</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+        <IndividualUnitPanels
+          openEVUnits={openEVUnits}
+          setOpenEVUnits={setOpenEVUnits}
+          evStations={evStations}
+          closeIndividualUnit={closeIndividualUnit}
 
-        {/* Individual Chiller Unit Panels */}
-        {Object.values(openChillerUnits).map((unit) => {
-          const chiller = chillers[unit.index];
-          if (!chiller) return null;
-          const statusColor = chiller.status === 'fault' ? '#ef4444' : '#10b981';
-          const statusText = chiller.status.charAt(0).toUpperCase() + chiller.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={chiller.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenChillerUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenChillerUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'chiller')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{chiller.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{chiller.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{chiller.pressure}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{chiller.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{chiller.runtime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{chiller.alert}</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+          openChillerUnits={openChillerUnits}
+          setOpenChillerUnits={setOpenChillerUnits}
+          chillers={chillers}
 
-        {/* Individual AHU Unit Panels */}
-        {Object.values(openAhuUnits).map((unit) => {
-          const ahu = ahus[unit.index];
-          if (!ahu) return null;
-          const statusColor = ahu.status === 'fault' ? '#ef4444' : '#10b981';
-          const statusText = ahu.status.charAt(0).toUpperCase() + ahu.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={ahu.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenAhuUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenAhuUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'ahu')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{ahu.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{ahu.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{ahu.pressure}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{ahu.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{ahu.runtime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{ahu.alert}</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+          openAhuUnits={openAhuUnits}
+          setOpenAhuUnits={setOpenAhuUnits}
+          ahus={ahus}
 
-        {/* Individual Electrical Unit Panels */}
-        {Object.values(openElectricalUnits).map((unit) => {
-          const electrical = electricals[unit.index];
-          if (!electrical) return null;
-          const statusColor = electrical.status === 'fault' ? '#ef4444' : '#10b981';
-          const statusText = electrical.status.charAt(0).toUpperCase() + electrical.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={electrical.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenElectricalUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenElectricalUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'electrical')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{electrical.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{electrical.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{electrical.pressure}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{electrical.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{electrical.runtime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{electrical.alert}</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+          openElectricalUnits={openElectricalUnits}
+          setOpenElectricalUnits={setOpenElectricalUnits}
+          electricals={electricals}
 
-        {/* Individual Pump Unit Panels */}
-        {Object.values(openPumpUnits).map((unit) => {
-          const pump = pumps[unit.index];
-          if (!pump) return null;
-          const statusColor = pump.status === 'fault' ? '#ef4444' : '#10b981';
-          const statusText = pump.status.charAt(0).toUpperCase() + pump.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={pump.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenPumpUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenPumpUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'pump')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{pump.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{pump.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{pump.pressure}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{pump.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{pump.runtime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{pump.alert}</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+          openPumpUnits={openPumpUnits}
+          setOpenPumpUnits={setOpenPumpUnits}
+          pumps={pumps}
 
-        {/* Individual Fire Unit Panels */}
-        {Object.values(openFireUnits).map((unit) => {
-          const fire = fires[unit.index];
-          if (!fire) return null;
-          const statusColor = fire.status === 'fault' ? '#ef4444' : '#10b981';
-          const statusText = fire.status.charAt(0).toUpperCase() + fire.status.slice(1);
-          return (
-            <DraggablePanel
-              key={unit.id}
-              panelId={unit.id}
-              title={fire.name}
-              position={unit.position}
-              setPosition={(pos) => setOpenFireUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], position: pos } }))}
-              minimized={unit.minimized}
-              setMinimized={(min) => setOpenFireUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
-              onClose={() => closeIndividualUnit(unit.id, 'fire')}
-              width={350}
-            >
-              <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ fontWeight: 700 }}>{fire.name}</div>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
-                  <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{fire.temp}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{fire.pressure}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{fire.power}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Runtime: </span><span style={{ fontWeight: 600 }}>{fire.runtime}</span></div>
-                  <div><span style={{ color: '#9ca3af' }}>Alert: </span><span style={{ fontWeight: 600 }}>{fire.alert}</span></div>
-                </div>
-              </div>
-            </DraggablePanel>
-          );
-        })}
+          openFireUnits={openFireUnits}
+          setOpenFireUnits={setOpenFireUnits}
+          fires={fires}
+        />
 
         {/* Equipment Filter panel (draggable) */}
         {filterVisible && (
