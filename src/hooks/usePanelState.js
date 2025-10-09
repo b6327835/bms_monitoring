@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { getSmartPosition } from '../utils/panelUtils';
 
 export function usePanelState() {
   // Overview panel states
@@ -63,76 +64,21 @@ export function usePanelState() {
   })[0];
 
   // Smart position calculation
-  const getSmartPosition = useCallback((panelId, width = 200) => {
-    // Collect all currently open or minimized panels with their positions
-    const openPanels = [];
-
-    if ((evPanelOpen || evPanelMin) && panelId !== 'ev') {
-      openPanels.push({ ...evPanelPos, width: 380, height: 60 });
-    }
-    if ((sidebarVisible || sidebarMin) && panelId !== 'sidebar') {
-      openPanels.push({ ...sidebarPos, width: 220, height: 60 });
-    }
-    if ((filterVisible || filterMin) && panelId !== 'filter') {
-      openPanels.push({ ...filterPos, width: 180, height: 60 });
-    }
-    if ((floorsVisible || floorsMin) && panelId !== 'floors') {
-      openPanels.push({ ...floorsPos, width: 220, height: 60 });
-    }
-    if ((equipmentOverviewVisible || equipmentOverviewMin) && panelId !== 'equipmentOverview') {
-      openPanels.push({ ...equipmentOverviewPos, width: 230, height: 60 });
-    }
-    if ((chillerPanelOpen || chillerPanelMin) && panelId !== 'chillerPanel') {
-      openPanels.push({ ...chillerPanelPos, width: 480, height: 60 });
-    }
-    if ((ahuPanelOpen || ahuPanelMin) && panelId !== 'ahuPanel') {
-      openPanels.push({ ...ahuPanelPos, width: 480, height: 60 });
-    }
-    if ((electricalPanelOpen || electricalPanelMin) && panelId !== 'electricalPanel') {
-      openPanels.push({ ...electricalPanelPos, width: 480, height: 60 });
-    }
-    if ((pumpPanelOpen || pumpPanelMin) && panelId !== 'pumpPanel') {
-      openPanels.push({ ...pumpPanelPos, width: 480, height: 60 });
-    }
-    if ((firePanelOpen || firePanelMin) && panelId !== 'firePanel') {
-      openPanels.push({ ...firePanelPos, width: 480, height: 60 });
-    }
-    if ((accidentOpen || accidentMin) && panelId !== 'accident') {
-      openPanels.push({ ...accidentPos, width: 200, height: 60 });
-    }
-
-    // Default position: top left
-    let bestX = 20;
-    let bestY = 70;
-
-    // If there are open panels, position below/next to them
-    if (openPanels.length > 0) {
-      // Sort panels by Y position (top to bottom)
-      openPanels.sort((a, b) => a.y - b.y);
-
-      // Try to find a position that doesn't overlap
-      for (let testY = 70; testY < window.innerHeight - 200; testY += 60) {
-        let hasOverlap = false;
-
-        for (const panel of openPanels) {
-          // Check if this position overlaps with existing panel
-          const horizontalOverlap = bestX < panel.x + panel.width && bestX + width > panel.x;
-          const verticalOverlap = testY < panel.y + 300 && testY + 300 > panel.y;
-
-          if (horizontalOverlap && verticalOverlap) {
-            hasOverlap = true;
-            break;
-          }
-        }
-
-        if (!hasOverlap) {
-          bestY = testY;
-          break;
-        }
-      }
-    }
-
-    return { x: bestX, y: bestY };
+  const getSmartPositionWrapped = useCallback((panelId, width = 200) => {
+    const panelStates = {
+      evPanelOpen, evPanelMin, evPanelPos,
+      sidebarVisible, sidebarMin, sidebarPos,
+      filterVisible, filterMin, filterPos,
+      floorsVisible, floorsMin, floorsPos,
+      equipmentOverviewVisible, equipmentOverviewMin, equipmentOverviewPos,
+      chillerPanelOpen, chillerPanelMin, chillerPanelPos,
+      ahuPanelOpen, ahuPanelMin, ahuPanelPos,
+      electricalPanelOpen, electricalPanelMin, electricalPanelPos,
+      pumpPanelOpen, pumpPanelMin, pumpPanelPos,
+      firePanelOpen, firePanelMin, firePanelPos,
+      accidentOpen, accidentMin, accidentPos
+    };
+    return getSmartPosition(panelId, width, panelStates);
   }, [
     evPanelOpen, evPanelMin, evPanelPos,
     sidebarVisible, sidebarMin, sidebarPos,
@@ -150,133 +96,133 @@ export function usePanelState() {
   // Panel toggle handlers
   const openEVPanel = useCallback(() => {
     if (!evPanelOpen && !panelOpenedBefore.ev) {
-      const pos = getSmartPosition('ev', 380);
+      const pos = getSmartPositionWrapped('ev', 380);
       setEvPanelPos(pos);
       panelOpenedBefore.ev = true;
     }
     setEvPanelOpen(true);
-  }, [evPanelOpen, getSmartPosition]);
+  }, [evPanelOpen, getSmartPositionWrapped]);
 
   const toggleSidebar = useCallback(() => {
     setSidebarVisible((v) => {
       if (!v && !panelOpenedBefore.sidebar) {
-        const pos = getSmartPosition('sidebar', 220);
+        const pos = getSmartPositionWrapped('sidebar', 220);
         setSidebarPos(pos);
         panelOpenedBefore.sidebar = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleFilter = useCallback(() => {
     setFilterVisible((v) => {
       if (!v && !panelOpenedBefore.filter) {
-        const pos = getSmartPosition('filter', 180);
+        const pos = getSmartPositionWrapped('filter', 180);
         setFilterPos(pos);
         panelOpenedBefore.filter = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleFloors = useCallback(() => {
     setFloorsVisible((v) => {
       if (!v && !panelOpenedBefore.floors) {
-        const pos = getSmartPosition('floors', 220);
+        const pos = getSmartPositionWrapped('floors', 220);
         setFloorsPos(pos);
         panelOpenedBefore.floors = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleEquipmentOverview = useCallback(() => {
     setEquipmentOverviewVisible((v) => {
       if (!v && !panelOpenedBefore.equipmentOverview) {
-        const pos = getSmartPosition('equipmentOverview', 230);
+        const pos = getSmartPositionWrapped('equipmentOverview', 230);
         setEquipmentOverviewPos(pos);
         panelOpenedBefore.equipmentOverview = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleChillerPanel = useCallback(() => {
     setChillerPanelOpen((v) => {
       if (!v && !panelOpenedBefore.chillerPanel) {
-        const pos = getSmartPosition('chillerPanel', 480);
+        const pos = getSmartPositionWrapped('chillerPanel', 480);
         setChillerPanelPos(pos);
         panelOpenedBefore.chillerPanel = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleAhuPanel = useCallback(() => {
     setAhuPanelOpen((v) => {
       if (!v && !panelOpenedBefore.ahuPanel) {
-        const pos = getSmartPosition('ahuPanel', 480);
+        const pos = getSmartPositionWrapped('ahuPanel', 480);
         setAhuPanelPos(pos);
         panelOpenedBefore.ahuPanel = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleElectricalPanel = useCallback(() => {
     setElectricalPanelOpen((v) => {
       if (!v && !panelOpenedBefore.electricalPanel) {
-        const pos = getSmartPosition('electricalPanel', 480);
+        const pos = getSmartPositionWrapped('electricalPanel', 480);
         setElectricalPanelPos(pos);
         panelOpenedBefore.electricalPanel = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const togglePumpPanel = useCallback(() => {
     setPumpPanelOpen((v) => {
       if (!v && !panelOpenedBefore.pumpPanel) {
-        const pos = getSmartPosition('pumpPanel', 480);
+        const pos = getSmartPositionWrapped('pumpPanel', 480);
         setPumpPanelPos(pos);
         panelOpenedBefore.pumpPanel = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleFirePanel = useCallback(() => {
     setFirePanelOpen((v) => {
       if (!v && !panelOpenedBefore.firePanel) {
-        const pos = getSmartPosition('firePanel', 480);
+        const pos = getSmartPositionWrapped('firePanel', 480);
         setFirePanelPos(pos);
         panelOpenedBefore.firePanel = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleEV = useCallback(() => {
     setEvPanelOpen((v) => {
       if (!v && !panelOpenedBefore.ev) {
-        const pos = getSmartPosition('ev', 380);
+        const pos = getSmartPositionWrapped('ev', 380);
         setEvPanelPos(pos);
         panelOpenedBefore.ev = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   const toggleAccident = useCallback(() => {
     setAccidentOpen((v) => {
       if (!v && !panelOpenedBefore.accident) {
-        const pos = getSmartPosition('accident', 200);
+        const pos = getSmartPositionWrapped('accident', 200);
         setAccidentPos(pos);
         panelOpenedBefore.accident = true;
       }
       return !v;
     });
-  }, [getSmartPosition]);
+  }, [getSmartPositionWrapped]);
 
   // Close handlers
   const closeAccident = useCallback(() => setAccidentOpen(false), []);

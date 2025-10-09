@@ -10,6 +10,7 @@ import EquipmentOverviewPanels from './components/EquipmentOverviewPanels';
 import IndividualUnitPanels from './components/IndividualUnitPanels';
 import { useEquipmentState } from './hooks/useEquipmentState';
 import { usePanelState } from './hooks/usePanelState';
+import { showToast as showToastUtil } from './utils/panelUtils';
 
 function OffscreenClock() {
   const spanRef = React.useRef(null);
@@ -41,6 +42,53 @@ function App() {
   // Camera controls
   const cameraControlsRef = React.useRef(null);
   const zoomIntervalRef = React.useRef(null);
+
+  // Use panel state hook
+  const {
+    chillerPanelOpen, setChillerPanelOpen, chillerPanelMin, setChillerPanelMin, chillerPanelPos, setChillerPanelPos,
+    ahuPanelOpen, setAhuPanelOpen, ahuPanelMin, setAhuPanelMin, ahuPanelPos, setAhuPanelPos,
+    electricalPanelOpen, setElectricalPanelOpen, electricalPanelMin, setElectricalPanelMin, electricalPanelPos, setElectricalPanelPos,
+    pumpPanelOpen, setPumpPanelOpen, pumpPanelMin, setPumpPanelMin, pumpPanelPos, setPumpPanelPos,
+    firePanelOpen, setFirePanelOpen, firePanelMin, setFirePanelMin, firePanelPos, setFirePanelPos,
+    evPanelOpen, setEvPanelOpen, evPanelMin, setEvPanelMin, evPanelPos, setEvPanelPos,
+    sidebarVisible, setSidebarVisible, sidebarMin, setSidebarMin, sidebarPos, setSidebarPos,
+    filterVisible, setFilterVisible, filterMin, setFilterMin, filterPos, setFilterPos,
+    floorsVisible, setFloorsVisible, floorsMin, setFloorsMin, floorsPos, setFloorsPos,
+    equipmentOverviewVisible, setEquipmentOverviewVisible, equipmentOverviewMin, setEquipmentOverviewMin, equipmentOverviewPos, setEquipmentOverviewPos,
+    accidentOpen, setAccidentOpen, accidentMin, setAccidentMin, accidentPos, setAccidentPos,
+    openEVPanel,
+    toggleSidebar,
+    toggleFilter,
+    toggleFloors,
+    toggleEquipmentOverview,
+    toggleChillerPanel,
+    toggleAhuPanel,
+    toggleElectricalPanel,
+    togglePumpPanel,
+    toggleFirePanel,
+    toggleEV,
+    toggleAccident,
+    closeAccident,
+    closeSidebar,
+    closeFilter,
+    closeEV,
+    closeFloors,
+    closeEquipmentOverview,
+    closeChillerPanel,
+    closeAhuPanel,
+    closeElectricalPanel,
+    closePumpPanel,
+    closeFirePanel
+  } = usePanelState();
+
+  // Create showToast function
+  const showToast = useCallback((message, type = 'success') => {
+    showToastUtil(setToast, message, type);
+  }, []);
+
+  // Toast and accident lock state
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [accidentLock, setAccidentLock] = useState(false);
 
   // Use equipment state hook
   const {
@@ -84,49 +132,7 @@ function App() {
     handleRandomAccident,
     handleRandomEVFuseDrop,
     handleFixAllAccident
-  } = useEquipmentState();
-
-  // Use panel state hook
-  const {
-    chillerPanelOpen, setChillerPanelOpen, chillerPanelMin, setChillerPanelMin, chillerPanelPos, setChillerPanelPos,
-    ahuPanelOpen, setAhuPanelOpen, ahuPanelMin, setAhuPanelMin, ahuPanelPos, setAhuPanelPos,
-    electricalPanelOpen, setElectricalPanelOpen, electricalPanelMin, setElectricalPanelMin, electricalPanelPos, setElectricalPanelPos,
-    pumpPanelOpen, setPumpPanelOpen, pumpPanelMin, setPumpPanelMin, pumpPanelPos, setPumpPanelPos,
-    firePanelOpen, setFirePanelOpen, firePanelMin, setFirePanelMin, firePanelPos, setFirePanelPos,
-    evPanelOpen, setEvPanelOpen, evPanelMin, setEvPanelMin, evPanelPos, setEvPanelPos,
-    sidebarVisible, setSidebarVisible, sidebarMin, setSidebarMin, sidebarPos, setSidebarPos,
-    filterVisible, setFilterVisible, filterMin, setFilterMin, filterPos, setFilterPos,
-    floorsVisible, setFloorsVisible, floorsMin, setFloorsMin, floorsPos, setFloorsPos,
-    equipmentOverviewVisible, setEquipmentOverviewVisible, equipmentOverviewMin, setEquipmentOverviewMin, equipmentOverviewPos, setEquipmentOverviewPos,
-    accidentOpen, setAccidentOpen, accidentMin, setAccidentMin, accidentPos, setAccidentPos,
-    openEVPanel,
-    toggleSidebar,
-    toggleFilter,
-    toggleFloors,
-    toggleEquipmentOverview,
-    toggleChillerPanel,
-    toggleAhuPanel,
-    toggleElectricalPanel,
-    togglePumpPanel,
-    toggleFirePanel,
-    toggleEV,
-    toggleAccident,
-    closeAccident,
-    closeSidebar,
-    closeFilter,
-    closeEV,
-    closeFloors,
-    closeEquipmentOverview,
-    closeChillerPanel,
-    closeAhuPanel,
-    closeElectricalPanel,
-    closePumpPanel,
-    closeFirePanel
-  } = usePanelState();
-
-  // Toast and accident lock state
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const [accidentLock, setAccidentLock] = useState(false);
+  } = useEquipmentState(showToast);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
@@ -142,83 +148,6 @@ function App() {
     pumpPanel: 0,
     firePanel: 0
   });
-
-  // Calculate smart position for new panels
-  const getSmartPosition = useCallback((panelId, width = 200) => {
-    // Collect all currently open or minimized panels with their positions
-    const openPanels = [];
-    
-    if ((evPanelOpen || evPanelMin) && panelId !== 'ev') {
-      openPanels.push({ ...evPanelPos, width: 380, height: 60 });
-    }
-    if ((sidebarVisible || sidebarMin) && panelId !== 'sidebar') {
-      openPanels.push({ ...sidebarPos, width: 220, height: 60 });
-    }
-    if ((filterVisible || filterMin) && panelId !== 'filter') {
-      openPanels.push({ ...filterPos, width: 180, height: 60 });
-    }
-    if ((floorsVisible || floorsMin) && panelId !== 'floors') {
-      openPanels.push({ ...floorsPos, width: 220, height: 60 });
-    }
-    if ((equipmentOverviewVisible || equipmentOverviewMin) && panelId !== 'equipmentOverview') {
-      openPanels.push({ ...equipmentOverviewPos, width: 230, height: 60 });
-    }
-    if ((chillerPanelOpen || chillerPanelMin) && panelId !== 'chillerPanel') {
-      openPanels.push({ ...chillerPanelPos, width: 480, height: 60 });
-    }
-    if ((ahuPanelOpen || ahuPanelMin) && panelId !== 'ahuPanel') {
-      openPanels.push({ ...ahuPanelPos, width: 480, height: 60 });
-    }
-    if ((electricalPanelOpen || electricalPanelMin) && panelId !== 'electricalPanel') {
-      openPanels.push({ ...electricalPanelPos, width: 480, height: 60 });
-    }
-    if ((pumpPanelOpen || pumpPanelMin) && panelId !== 'pumpPanel') {
-      openPanels.push({ ...pumpPanelPos, width: 480, height: 60 });
-    }
-    if ((firePanelOpen || firePanelMin) && panelId !== 'firePanel') {
-      openPanels.push({ ...firePanelPos, width: 480, height: 60 });
-    }
-    if ((accidentOpen || accidentMin) && panelId !== 'accident') {
-      openPanels.push({ ...accidentPos, width: 200, height: 60 });
-    }
-    
-    // Default position: top left
-    let bestX = 20;
-    let bestY = 70;
-    
-    // If there are open panels, position below/next to them
-    if (openPanels.length > 0) {
-      // Sort panels by Y position (top to bottom)
-      openPanels.sort((a, b) => a.y - b.y);
-      
-      // Try to find a position that doesn't overlap
-      for (let testY = 70; testY < window.innerHeight - 200; testY += 60) {
-        let hasOverlap = false;
-        
-        for (const panel of openPanels) {
-          // Check if this position overlaps with existing panel
-          const horizontalOverlap = bestX < panel.x + panel.width && bestX + width > panel.x;
-          const verticalOverlap = testY < panel.y + 300 && testY + 300 > panel.y;
-          
-          if (horizontalOverlap && verticalOverlap) {
-            hasOverlap = true;
-            break;
-          }
-        }
-        
-        if (!hasOverlap) {
-          bestY = testY;
-          break;
-        }
-      }
-    }
-    
-    return { x: bestX, y: bestY };
-  }, [evPanelOpen, evPanelMin, evPanelPos, sidebarVisible, sidebarMin, sidebarPos, 
-      filterVisible, filterMin, filterPos, accidentOpen, accidentMin, accidentPos, chillerPanelOpen, 
-      chillerPanelMin, chillerPanelPos, ahuPanelOpen, ahuPanelMin, ahuPanelPos, 
-      electricalPanelOpen, electricalPanelMin, electricalPanelPos, pumpPanelOpen, 
-      pumpPanelMin, pumpPanelPos, firePanelOpen, firePanelMin, firePanelPos]);
 
 
   // Helper to open EV panel with smart positioning (now from hook)
@@ -279,15 +208,10 @@ function App() {
 
   // Memoized callbacks to prevent unnecessary re-renders (now from hook)
 
-  function showToast(message, type = 'success') {
-    setToast({ visible: true, message, type });
-    setTimeout(() => setToast({ visible: false, message: '' }), 5000);
-  }
-
   function handleStopAccident() {
     setAccidentLock((prev) => {
       const next = !prev;
-      showToast(next ? 'Accidents locked' : 'Accidents resumed', 'success');
+      showToastUtil(setToast, next ? 'Accidents locked' : 'Accidents resumed', 'success');
       return next;
     });
   }
