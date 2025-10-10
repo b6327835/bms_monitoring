@@ -135,11 +135,11 @@ export function useEquipmentState(showToast, token, setToken) {
   const [openFireUnits, setOpenFireUnits] = useState({});
 
   // Derived indicators
-  const chillerIndicators = useMemo(() => chillers.map(c => c.status === 'fault' ? 'fault' : 'normal'), [chillers]);
-  const ahuIndicators = useMemo(() => ahus.map(a => a.status === 'fault' ? 'fault' : 'normal'), [ahus]);
-  const electricalIndicators = useMemo(() => electricals.map(e => e.status === 'fault' ? 'fault' : 'normal'), [electricals]);
-  const pumpIndicators = useMemo(() => pumps.map(p => p.status === 'fault' ? 'fault' : 'normal'), [pumps]);
-  const fireIndicators = useMemo(() => fires.map(f => f.status === 'fault' ? 'fault' : 'normal'), [fires]);
+  const chillerIndicators = useMemo(() => chillers.map(c => c.status === 'fault' || (c.alert && c.alert !== 'Loading...' && c.alert !== 'None' && c.alert.trim() !== '') ? 'fault' : 'normal'), [chillers]);
+  const ahuIndicators = useMemo(() => ahus.map(a => a.status === 'fault' || (a.alert && a.alert !== 'Loading...' && a.alert !== 'None' && a.alert.trim() !== '') ? 'fault' : 'normal'), [ahus]);
+  const electricalIndicators = useMemo(() => electricals.map(e => e.status === 'fault' || (e.alert && e.alert !== 'Loading...' && e.alert !== 'None' && e.alert.trim() !== '') ? 'fault' : 'normal'), [electricals]);
+  const pumpIndicators = useMemo(() => pumps.map(p => p.status === 'fault' || (p.alert && p.alert !== 'Loading...' && p.alert !== 'None' && p.alert.trim() !== '') ? 'fault' : 'normal'), [pumps]);
+  const fireIndicators = useMemo(() => fires.map(f => f.status === 'fault' || (f.alert && f.alert !== 'Loading...' && f.alert !== 'None' && f.alert.trim() !== '') ? 'fault' : 'normal'), [fires]);
 
   // EV Summary
   const evSummary = useMemo(() => {
