@@ -303,6 +303,7 @@ function App() {
             onMouseLeave={stopZoom}
             style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >−</button>
+          <button title="Accident" onClick={toggleAccident} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #7f1d1d', background: '#7f1d1d', color: 'white', fontWeight: 800, fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>A</button>
         </div>
 
         {/* Transparency slider - above bottom-left dock */}
@@ -342,12 +343,6 @@ function App() {
           <button title="Filter" onClick={toggleFilter} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
           <button title="EV Panel" onClick={toggleEV} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
         </div>
-
-        {/* Bottom-right dock for Accident */}
-        <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
-          <button title="Accident" onClick={toggleAccident} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #7f1d1d', background: '#7f1d1d', color: 'white', fontWeight: 800, fontSize: 11, cursor: 'pointer' }}>A</button>
-        </div>
-
 
         {/* Accident Controls Panel (draggable) */}
         {accidentOpen && (

@@ -51,131 +51,134 @@ export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel
     }
   }, [dragEndTrigger, isDraggingAnyPanel, isFetching]); // Run when drag ends
 
-  // Fetch data from backend
-  useEffect(() => {
-    if (!token) return;
-
-    const fetchData = () => {
-      // Skip starting a new fetch if user is dragging
-      if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
-        return;
-      }
-      
-      isFetchingRef.current = true;
-      setIsFetching(true);
-      fetch('https://bms-backend-rust.vercel.app/equipment-data', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-        .then(res => {
-          if (!res.ok) {
-            if (res.status === 401) {
-              localStorage.removeItem('token');
-              setToken('');
-              showToast('Session expired. Please log in again.', 'warning');
-            }
-            throw new Error(`HTTP ${res.status}`);
+  // Reusable fetch function
+  const fetchData = useCallback(() => {
+    if (!token) return Promise.resolve();
+    
+    // Skip starting a new fetch if user is dragging
+    if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
+      return Promise.resolve();
+    }
+    
+    isFetchingRef.current = true;
+    setIsFetching(true);
+    return fetch('https://bms-backend-rust.vercel.app/equipment-data', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => {
+        if (!res.ok) {
+          if (res.status === 401) {
+            localStorage.removeItem('token');
+            setToken('');
+            showToast('Session expired. Please log in again.', 'warning');
           }
-          return res.json();
-        })
-        .then(data => {
-          if (data.data) {
-            // Group by type and sort by ID to match array indices
-            const evData = data.data.filter(d => d.equipment_type === 'evcharger')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const evArray = Object.values(evData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            
-            const chillerData = data.data.filter(d => d.equipment_type === 'chiller')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const chillerArray = Object.values(chillerData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            
-            const ahuData = data.data.filter(d => d.equipment_type === 'ahu')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const ahuArray = Object.values(ahuData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            
-            const electricalData = data.data.filter(d => d.equipment_type === 'electrical')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const electricalArray = Object.values(electricalData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            
-            const pumpData = data.data.filter(d => d.equipment_type === 'pump')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const pumpArray = Object.values(pumpData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            
-            const fireData = data.data.filter(d => d.equipment_type === 'fire')
-              .reduce((acc, curr) => {
-                const key = curr.equipment_id;
-                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
-                  acc[key] = curr;
-                }
-                return acc;
-              }, {});
-            const fireArray = Object.values(fireData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data.data) {
+          // Group by type and sort by ID to match array indices
+          const evData = data.data.filter(d => d.equipment_type === 'evcharger')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const evArray = Object.values(evData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          
+          const chillerData = data.data.filter(d => d.equipment_type === 'chiller')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const chillerArray = Object.values(chillerData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          
+          const ahuData = data.data.filter(d => d.equipment_type === 'ahu')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const ahuArray = Object.values(ahuData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          
+          const electricalData = data.data.filter(d => d.equipment_type === 'electrical')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const electricalArray = Object.values(electricalData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          
+          const pumpData = data.data.filter(d => d.equipment_type === 'pump')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const pumpArray = Object.values(pumpData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+          
+          const fireData = data.data.filter(d => d.equipment_type === 'fire')
+            .reduce((acc, curr) => {
+              const key = curr.equipment_id;
+              if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                acc[key] = curr;
+              }
+              return acc;
+            }, {});
+          const fireArray = Object.values(fireData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
 
-            // Check if user is currently dragging when fetch completes
-            if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
-              // Buffer the data for later application
-              pendingDataRef.current = {
-                evStations: evArray.length ? evArray : null,
-                chillers: chillerArray.length ? chillerArray : null,
-                ahus: ahuArray.length ? ahuArray : null,
-                electricals: electricalArray.length ? electricalArray : null,
-                pumps: pumpArray.length ? pumpArray : null,
-                fires: fireArray.length ? fireArray : null
-              };
-              // Don't update isFetching state during drag to prevent re-renders
-              isFetchingRef.current = false;
-            } else {
-              // Apply immediately if not dragging
-              if (evArray.length) setEvStations(evArray);
-              if (chillerArray.length) setChillers(chillerArray);
-              if (ahuArray.length) setAhus(ahuArray);
-              if (electricalArray.length) setElectricals(electricalArray);
-              if (pumpArray.length) setPumps(pumpArray);
-              if (fireArray.length) setFires(fireArray);
-              isFetchingRef.current = false;
-              setIsFetching(false);
-            }
+          // Check if user is currently dragging when fetch completes
+          if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
+            // Buffer the data for later application
+            pendingDataRef.current = {
+              evStations: evArray.length ? evArray : null,
+              chillers: chillerArray.length ? chillerArray : null,
+              ahus: ahuArray.length ? ahuArray : null,
+              electricals: electricalArray.length ? electricalArray : null,
+              pumps: pumpArray.length ? pumpArray : null,
+              fires: fireArray.length ? fireArray : null
+            };
+            // Don't update isFetching state during drag to prevent re-renders
+            isFetchingRef.current = false;
           } else {
-            // No data, safe to update fetching state
+            // Apply immediately if not dragging
+            if (evArray.length) setEvStations(evArray);
+            if (chillerArray.length) setChillers(chillerArray);
+            if (ahuArray.length) setAhus(ahuArray);
+            if (electricalArray.length) setElectricals(electricalArray);
+            if (pumpArray.length) setPumps(pumpArray);
+            if (fireArray.length) setFires(fireArray);
             isFetchingRef.current = false;
             setIsFetching(false);
           }
-        })
-        .catch(err => {
-          console.error('Failed to fetch equipment data:', err);
+        } else {
+          // No data, safe to update fetching state
           isFetchingRef.current = false;
           setIsFetching(false);
-        });
-    };
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch equipment data:', err);
+        isFetchingRef.current = false;
+        setIsFetching(false);
+      });
+  }, [token, isDraggingAnyPanel, showToast, setToken]);
+
+  // Fetch data from backend
+  useEffect(() => {
+    if (!token) return;
 
     // Fetch immediately
     fetchData();
@@ -184,7 +187,7 @@ export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel
     const interval = setInterval(fetchData, 5000);
 
     return () => clearInterval(interval);
-  }, [token]);
+  }, [token, fetchData]);
 
   // Individual unit panels
   const [openEVUnits, setOpenEVUnits] = useState({});
@@ -341,17 +344,23 @@ export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel
     }
   }, [openEVUnits, openChillerUnits, openAhuUnits, openElectricalUnits, openPumpUnits, openFireUnits]);
 
-  const handleRandomAccidentWrapped = useCallback(() => {
-    handleRandomAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
-  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token]);
+  const handleRandomAccidentWrapped = useCallback(async () => {
+    await handleRandomAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
+    // Fetch new data immediately after accident is created
+    fetchData();
+  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token, fetchData]);
 
-  const handleRandomEVFuseDropWrapped = useCallback(() => {
-    handleRandomEVFuseDrop(evStations, setEvStations, showToast, token);
-  }, [evStations, showToast, token]);
+  const handleRandomEVFuseDropWrapped = useCallback(async () => {
+    await handleRandomEVFuseDrop(evStations, setEvStations, showToast, token);
+    // Fetch new data immediately after fuse drop is created
+    fetchData();
+  }, [evStations, showToast, token, fetchData]);
 
-  const handleFixAllAccidentWrapped = useCallback(() => {
-    handleFixAllAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
-  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token]);
+  const handleFixAllAccidentWrapped = useCallback(async () => {
+    await handleFixAllAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
+    // Fetch new data immediately after all accidents are fixed
+    fetchData();
+  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token, fetchData]);
 
   return {
     // Data
