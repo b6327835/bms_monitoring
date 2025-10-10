@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { handleRandomAccident, handleRandomEVFuseDrop, handleFixAllAccident } from '../utils/accidentHandlers';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires, initialEvStations } from '../constants/equipmentData';
 
-export function useEquipmentState(showToast, token, setToken) {
+export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel, dragEndTrigger) {
   // EV Stations data
   const [evStations, setEvStations] = useState(initialEvStations);
 
@@ -18,12 +18,50 @@ export function useEquipmentState(showToast, token, setToken) {
   const [fires, setFires] = useState(initialFires);
 
   const [isFetching, setIsFetching] = useState(false);
+  const isFetchingRef = React.useRef(false); // Track if fetch is in progress
+  
+  // Store pending data during drag
+  const pendingDataRef = React.useRef(null);
+
+  // Apply pending data when drag stops
+  useEffect(() => {
+    // Only run if we have the drag tracking ref
+    if (!isDraggingAnyPanel) return;
+    
+    // Check if drag stopped
+    if (!isDraggingAnyPanel.current) {
+      // If we have pending data, apply it
+      if (pendingDataRef.current) {
+        const data = pendingDataRef.current;
+        pendingDataRef.current = null;
+        
+        // Apply all pending updates (only non-null values)
+        if (data.evStations) setEvStations(data.evStations);
+        if (data.chillers) setChillers(data.chillers);
+        if (data.ahus) setAhus(data.ahus);
+        if (data.electricals) setElectricals(data.electricals);
+        if (data.pumps) setPumps(data.pumps);
+        if (data.fires) setFires(data.fires);
+      }
+      
+      // Clear isFetching if it's still set (in case fetch completed during drag)
+      if (!isFetchingRef.current && isFetching) {
+        setIsFetching(false);
+      }
+    }
+  }, [dragEndTrigger, isDraggingAnyPanel, isFetching]); // Run when drag ends
 
   // Fetch data from backend
   useEffect(() => {
     if (!token) return;
 
     const fetchData = () => {
+      // Skip starting a new fetch if user is dragging
+      if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
+        return;
+      }
+      
+      isFetchingRef.current = true;
       setIsFetching(true);
       fetch('https://bms-backend-rust.vercel.app/equipment-data', {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -102,17 +140,39 @@ export function useEquipmentState(showToast, token, setToken) {
               }, {});
             const fireArray = Object.values(fireData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
 
-            if (evArray.length) setEvStations(evArray);
-            if (chillerArray.length) setChillers(chillerArray);
-            if (ahuArray.length) setAhus(ahuArray);
-            if (electricalArray.length) setElectricals(electricalArray);
-            if (pumpArray.length) setPumps(pumpArray);
-            if (fireArray.length) setFires(fireArray);
+            // Check if user is currently dragging when fetch completes
+            if (isDraggingAnyPanel && isDraggingAnyPanel.current) {
+              // Buffer the data for later application
+              pendingDataRef.current = {
+                evStations: evArray.length ? evArray : null,
+                chillers: chillerArray.length ? chillerArray : null,
+                ahus: ahuArray.length ? ahuArray : null,
+                electricals: electricalArray.length ? electricalArray : null,
+                pumps: pumpArray.length ? pumpArray : null,
+                fires: fireArray.length ? fireArray : null
+              };
+              // Don't update isFetching state during drag to prevent re-renders
+              isFetchingRef.current = false;
+            } else {
+              // Apply immediately if not dragging
+              if (evArray.length) setEvStations(evArray);
+              if (chillerArray.length) setChillers(chillerArray);
+              if (ahuArray.length) setAhus(ahuArray);
+              if (electricalArray.length) setElectricals(electricalArray);
+              if (pumpArray.length) setPumps(pumpArray);
+              if (fireArray.length) setFires(fireArray);
+              isFetchingRef.current = false;
+              setIsFetching(false);
+            }
+          } else {
+            // No data, safe to update fetching state
+            isFetchingRef.current = false;
+            setIsFetching(false);
           }
-          setIsFetching(false);
         })
         .catch(err => {
           console.error('Failed to fetch equipment data:', err);
+          isFetchingRef.current = false;
           setIsFetching(false);
         });
     };
@@ -282,16 +342,16 @@ export function useEquipmentState(showToast, token, setToken) {
   }, [openEVUnits, openChillerUnits, openAhuUnits, openElectricalUnits, openPumpUnits, openFireUnits]);
 
   const handleRandomAccidentWrapped = useCallback(() => {
-    handleRandomAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast);
-  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast]);
+    handleRandomAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
+  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token]);
 
   const handleRandomEVFuseDropWrapped = useCallback(() => {
-    handleRandomEVFuseDrop(evStations, setEvStations, showToast);
-  }, [evStations, showToast]);
+    handleRandomEVFuseDrop(evStations, setEvStations, showToast, token);
+  }, [evStations, showToast, token]);
 
   const handleFixAllAccidentWrapped = useCallback(() => {
-    handleFixAllAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast);
-  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast]);
+    handleFixAllAccident(evStations, setEvStations, chillers, setChillers, ahus, setAhus, electricals, setElectricals, pumps, setPumps, fires, setFires, showToast, token);
+  }, [evStations, chillers, ahus, electricals, pumps, fires, showToast, token]);
 
   return {
     // Data

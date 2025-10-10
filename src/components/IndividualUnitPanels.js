@@ -1,47 +1,5 @@
 import React from 'react';
-import Draggable from 'react-draggable';
-
-const DraggablePanel = React.memo(({ panelId, title, position, setPosition, minimized, setMinimized, onClose, width = 200, children }) => {
-  const nodeRef = React.useRef(null);
-
-  // Calculate minimized width based on title length
-  const minimizedWidth = minimized ? Math.max(120, title.length * 6 + 60) : width;
-
-  // Prevent drag when clicking buttons
-  const handleMinimize = (e) => {
-    e.stopPropagation();
-    setMinimized(!minimized);
-  };
-
-  const handleClose = (e) => {
-    e.stopPropagation();
-    onClose();
-  };
-
-  return (
-    <Draggable
-      nodeRef={nodeRef}
-      position={position}
-      onStop={(e, data) => setPosition({ x: data.x, y: data.y })}
-      handle=".drag-handle"
-    >
-      <div ref={nodeRef} style={{ position: 'absolute', width: minimizedWidth, background: 'rgba(17,24,39,0.95)', color: '#e5e7eb', borderRadius: 6, boxShadow: '0 8px 20px rgba(0,0,0,0.4)', border: '1px solid #1f2937', zIndex: 3, overflow: 'hidden', fontSize: 11, transition: 'width 0.2s ease' }}>
-        <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', background: '#111827', cursor: 'move', borderBottom: minimized ? 'none' : '1px solid #1f2937', userSelect: 'none' }}>
-          <div style={{ fontWeight: 700, fontSize: 10, letterSpacing: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
-          <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-            <button title={minimized ? 'Expand' : 'Minimize'} onClick={handleMinimize} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #374151', background: '#1f2937', color: '#e5e7eb', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>{minimized ? '▢' : '▁'}</button>
-            <button title="Close" onClick={handleClose} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #7f1d1d', background: '#b91c1c', color: 'white', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>✕</button>
-          </div>
-        </div>
-        {!minimized && (
-          <div style={{ padding: 6, maxHeight: '50vh', overflow: 'auto', fontSize: 10 }}>
-            {children}
-          </div>
-        )}
-      </div>
-    </Draggable>
-  );
-});
+import DraggablePanel from './DraggablePanel';
 
 export default function IndividualUnitPanels({
   // EV panels
@@ -73,7 +31,11 @@ export default function IndividualUnitPanels({
   // Fire panels
   openFireUnits,
   setOpenFireUnits,
-  fires
+  fires,
+  
+  // Drag callbacks
+  onDragStart,
+  onDragEnd
 }) {
   return (
     <>
@@ -94,6 +56,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenEVUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'ev')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -134,6 +98,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenChillerUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'chiller')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -170,6 +136,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenAhuUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'ahu')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -206,6 +174,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenElectricalUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'electrical')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -242,6 +212,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenPumpUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'pump')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -278,6 +250,8 @@ export default function IndividualUnitPanels({
             setMinimized={(min) => setOpenFireUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'fire')}
             width={350}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>

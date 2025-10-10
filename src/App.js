@@ -2,12 +2,12 @@ import './App.css';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import BuildingModel from './components/BuildingModel';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import Draggable from 'react-draggable';
+import React, { useState, useCallback } from 'react';
 import commitHash from './version';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires } from './constants/equipmentData';
 import EquipmentOverviewPanels from './components/EquipmentOverviewPanels';
 import IndividualUnitPanels from './components/IndividualUnitPanels';
+import DraggablePanel from './components/DraggablePanel';
 import { useEquipmentState } from './hooks/useEquipmentState';
 import { usePanelState } from './hooks/usePanelState';
 import { showToast as showToastUtil } from './utils/panelUtils';
@@ -80,6 +80,26 @@ function App() {
   const [showPump, setShowPump] = useState(true);
   const [showFire, setShowFire] = useState(true);
 
+  // Global drag state tracking
+  const isDraggingAnyPanel = React.useRef(false);
+  const dragCount = React.useRef(0);
+  const [dragEndTrigger, setDragEndTrigger] = useState(0); // Trigger to notify when drag ends
+
+  const handleDragStart = useCallback(() => {
+    dragCount.current++;
+    isDraggingAnyPanel.current = true;
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    dragCount.current--;
+    if (dragCount.current <= 0) {
+      dragCount.current = 0;
+      isDraggingAnyPanel.current = false;
+      // Notify that drag ended by incrementing trigger
+      setDragEndTrigger(prev => prev + 1);
+    }
+  }, []);
+
   // Camera controls
   const cameraControlsRef = React.useRef(null);
   const zoomIntervalRef = React.useRef(null);
@@ -127,9 +147,8 @@ function App() {
     showToastUtil(setToast, message, type);
   }, []);
 
-  // Toast and accident lock state
+  // Toast state
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const [accidentLock, setAccidentLock] = useState(false);
 
   // Use equipment state hook
   const {
@@ -174,7 +193,7 @@ function App() {
     handleRandomAccident,
     handleRandomEVFuseDrop,
     handleFixAllAccident
-  } = useEquipmentState(showToast, token, setToken);
+  } = useEquipmentState(showToast, token, setToken, isDraggingAnyPanel, dragEndTrigger);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
@@ -249,78 +268,6 @@ function App() {
   }, []);
 
   // Memoized callbacks to prevent unnecessary re-renders (now from hook)
-
-  function handleStopAccident() {
-    setAccidentLock((prev) => {
-      const next = !prev;
-      showToastUtil(setToast, next ? 'Accidents locked' : 'Accidents resumed', 'success');
-      return next;
-    });
-  }
-
-  const DraggablePanel = React.memo(({ panelId, title, position, setPosition, minimized, setMinimized, onClose, width = 200, children }) => {
-    const nodeRef = React.useRef(null);
-    const contentRef = React.useRef(null);
-    
-    // Calculate minimized width based on title length
-    const minimizedWidth = minimized ? Math.max(120, title.length * 6 + 60) : width;
-    
-    // Restore scroll position BEFORE paint (synchronous)
-    React.useLayoutEffect(() => {
-      if (contentRef.current && !minimized) {
-        const savedScroll = scrollPositions.current[panelId] || 0;
-        if (contentRef.current.scrollTop !== savedScroll) {
-          contentRef.current.scrollTop = savedScroll;
-        }
-      }
-    }); // No deps = runs after every render
-    
-    // Save scroll position on scroll
-    const handleScroll = (e) => {
-      if (scrollPositions.current) {
-        scrollPositions.current[panelId] = e.target.scrollTop;
-      }
-    };
-    
-    // Prevent drag when clicking buttons
-    const handleMinimize = (e) => {
-      e.stopPropagation();
-      setMinimized(!minimized);
-    };
-    
-    const handleClose = (e) => {
-      e.stopPropagation();
-      onClose();
-    };
-    
-    return (
-      <Draggable
-        nodeRef={nodeRef}
-        position={position}
-        onStop={(e, data) => setPosition({ x: data.x, y: data.y })}
-        handle=".drag-handle"
-      >
-        <div ref={nodeRef} style={{ position: 'absolute', width: minimizedWidth, background: 'rgba(17,24,39,0.95)', color: '#e5e7eb', borderRadius: 6, boxShadow: '0 8px 20px rgba(0,0,0,0.4)', border: '1px solid #1f2937', zIndex: 3, overflow: 'hidden', fontSize: 11, transition: 'width 0.2s ease' }}>
-          <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', background: '#111827', cursor: 'move', borderBottom: minimized ? 'none' : '1px solid #1f2937', userSelect: 'none' }}>
-            <div style={{ fontWeight: 700, fontSize: 10, letterSpacing: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
-            <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-              <button title={minimized ? 'Expand' : 'Minimize'} onClick={handleMinimize} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #374151', background: '#1f2937', color: '#e5e7eb', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>{minimized ? '▢' : '▁'}</button>
-              <button title="Close" onClick={handleClose} onMouseDown={(e) => e.stopPropagation()} style={{ border: '1px solid #7f1d1d', background: '#b91c1c', color: 'white', borderRadius: 4, padding: '2px 4px', cursor: 'pointer', fontSize: 10, lineHeight: 1 }}>✕</button>
-            </div>
-          </div>
-          {!minimized && (
-            <div 
-              ref={contentRef}
-              onScroll={handleScroll}
-              style={{ padding: 6, maxHeight: '50vh', overflow: 'auto', fontSize: 10 }}
-            >
-              {children}
-            </div>
-          )}
-        </div>
-      </Draggable>
-    );
-  });
 
   if (!token) {
     return <LoginForm onLogin={setToken} />;
@@ -401,21 +348,13 @@ function App() {
           <button title="Accident" onClick={toggleAccident} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #7f1d1d', background: '#7f1d1d', color: 'white', fontWeight: 800, fontSize: 11, cursor: 'pointer' }}>A</button>
         </div>
 
-        {/* System Lock Indicator */}
-        {accidentLock && (
-          <div style={{ position: 'absolute', top: '70px', left: '50%', transform: 'translateX(-50%)', background: '#7f8c8d', color: 'white', padding: '8px 15px', borderRadius: '50px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}>
-            System accidents are locked
-          </div>
-        )}
-
 
         {/* Accident Controls Panel (draggable) */}
         {accidentOpen && (
-          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={200}>
+          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={200} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button onClick={handleRandomAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random accident</button>
               <button onClick={handleRandomEVFuseDrop} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random Drop EV Fuse</button>
-              <button onClick={handleStopAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#0b3d3a', color: '#a7f3d0', cursor: 'pointer', fontWeight: 800, fontSize: 12 }}>{accidentLock ? 'Resume Accident' : 'Stop Accident'}</button>
               <button onClick={handleFixAllAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#0b3d0b', color: '#bbf7d0', cursor: 'pointer', fontWeight: 800, fontSize: 12 }}>Fix ALL Accident</button>
             </div>
           </DraggablePanel>
@@ -444,7 +383,7 @@ function App() {
 
         {/* Sidebar (draggable) */}
         {sidebarVisible && (
-          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={220}>
+          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '6px', marginBottom: '8px', color: '#e5e7eb' }}>System Status</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
@@ -463,7 +402,7 @@ function App() {
 
         {/* Floors panel (draggable) */}
         {floorsVisible && (
-          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220}>
+          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {['All Overview','Floor 1 - Lobby & EV','Floor 2 - Office','Floor 3 - Data Center','Floor 4 - Mechanical','Floor 5 - Rooftop'].map((t, i) => (
                 <button key={i} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'left', fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>{t}</button>
@@ -474,7 +413,7 @@ function App() {
 
         {/* Equipment overview panel (draggable) */}
         {equipmentOverviewVisible && (
-          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230}>
+          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <button onClick={toggleChillerPanel} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
@@ -544,6 +483,9 @@ function App() {
           setFirePanelMin={setFirePanelMin}
           closeFirePanel={closeFirePanel}
           fires={fires}
+          
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
         />
 
         <IndividualUnitPanels
@@ -571,11 +513,14 @@ function App() {
           openFireUnits={openFireUnits}
           setOpenFireUnits={setOpenFireUnits}
           fires={fires}
+          
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
         />
 
         {/* Equipment Filter panel (draggable) */}
         {filterVisible && (
-          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={180}>
+          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={180} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {[{label:'Chiller', state: showChiller, set:setShowChiller, color:'#3498db'}, {label:'AHU', state: showAHU, set:setShowAHU, color:'#2ecc71'}, {label:'Electrical', state: showElectrical, set:setShowElectrical, color:'#f39c12'}, {label:'Water Pump', state: showPump, set:setShowPump, color:'#9b59b6'}, {label:'Fire Alarm', state: showFire, set:setShowFire, color:'#e74c3c'}, {label:'EV Charging', state: showEV, set:setShowEV, color:'#1abc9c'}].map((it, idx) => (
               <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: it.color }} />
@@ -587,7 +532,7 @@ function App() {
         )}
 
         {evPanelOpen && (
-          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380}>
+          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: 8 }}>
               <div style={{ background: '#0b1220', borderLeft: '3px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.total}</div>
