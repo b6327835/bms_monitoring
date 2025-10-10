@@ -1,6 +1,7 @@
 import './App.css';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import * as THREE from 'three';
 import BuildingModel from './components/BuildingModel';
 import React, { useState, useCallback } from 'react';
 import commitHash from './version';
@@ -215,8 +216,89 @@ function App() {
 
   // Helper to open EV panel with smart positioning (now from hook)
 
+  // Function to calculate equipment position
+  const getEquipmentPosition = useCallback((type, index) => {
+    switch (type) {
+      case 'EV Charging Station':
+        const evRow = Math.floor(index / 6);
+        const evCol = index % 6;
+        return new THREE.Vector3(-20 + evCol * 6, 1, -10 + evRow * 4);
+      
+      case 'Chiller':
+        return new THREE.Vector3(-20 + index * 20, 32, 0);
+      
+      case 'AHU':
+        const ahuFloor = Math.floor(index / 3) + 1;
+        return new THREE.Vector3(-15 + (index % 3) * 15, ahuFloor * 8, 12);
+      
+      case 'Electrical Panel':
+        const electricalFloor = Math.floor(index / 2) + 1;
+        return new THREE.Vector3(25, electricalFloor * 8, -8 + (index % 2) * 16);
+      
+      case 'Water Pump':
+        return new THREE.Vector3(8 + (index % 3) * 8, 8, 8 + Math.floor(index / 3) * 6);
+      
+      case 'Fire Alarm':
+        const fireFloor = Math.floor(index / 3);
+        return new THREE.Vector3(-12 + (index % 3) * 12, fireFloor * 8, -10);
+      
+      default:
+        return new THREE.Vector3(0, 0, 0);
+    }
+  }, []);
+
+  // Function to move camera to equipment with smooth animation
+  const moveCameraToEquipment = useCallback((type, index) => {
+    if (!cameraControlsRef.current) return;
+    
+    const targetPosition = getEquipmentPosition(type, index);
+    const camera = cameraControlsRef.current.object;
+    const controls = cameraControlsRef.current;
+    
+    // Calculate new camera position (offset from target)
+    const offset = new THREE.Vector3(8, 5, 8);
+    const newCameraPosition = targetPosition.clone().add(offset);
+    const newTargetPosition = targetPosition.clone();
+    
+    // Store current positions
+    const startCameraPosition = camera.position.clone();
+    const startTargetPosition = controls.target.clone();
+    
+    // Animation parameters
+    const duration = 1000; // 1 second
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Smooth easing function (ease-out)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      // Interpolate camera position
+      camera.position.lerpVectors(startCameraPosition, newCameraPosition, easeProgress);
+      
+      // Interpolate target position
+      controls.target.lerpVectors(startTargetPosition, newTargetPosition, easeProgress);
+      
+      // Update controls
+      controls.update();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    // Start animation
+    animate();
+  }, [getEquipmentPosition]);
+
   // Handler to open faulty equipment panel
   const handleOpenFaultyEquipment = useCallback((item) => {
+    // Move camera to equipment first
+    moveCameraToEquipment(item.type, item.index);
+    
+    // Then open the individual panel
     switch (item.type) {
       case 'EV Charging Station':
         openIndividualEV(item.index);
@@ -239,7 +321,7 @@ function App() {
       default:
         console.warn('Unknown equipment type:', item.type);
     }
-  }, [openIndividualEV, openIndividualChiller, openIndividualAhu, openIndividualElectrical, openIndividualPump, openIndividualFire]);
+  }, [moveCameraToEquipment, openIndividualEV, openIndividualChiller, openIndividualAhu, openIndividualElectrical, openIndividualPump, openIndividualFire]);
 
   // Camera control functions
   const handleCameraHome = useCallback(() => {
