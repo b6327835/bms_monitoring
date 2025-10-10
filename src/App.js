@@ -8,6 +8,7 @@ import { initialChillers, initialAhus, initialElectricals, initialPumps, initial
 import EquipmentOverviewPanels from './components/EquipmentOverviewPanels';
 import IndividualUnitPanels from './components/IndividualUnitPanels';
 import DraggablePanel from './components/DraggablePanel';
+import FaultyEquipmentPanel from './components/FaultyEquipmentPanel';
 import { useEquipmentState } from './hooks/useEquipmentState';
 import { usePanelState } from './hooks/usePanelState';
 import { showToast as showToastUtil } from './utils/panelUtils';
@@ -183,6 +184,7 @@ function App() {
     pumpIndicators,
     fireIndicators,
     evSummary,
+    faultyEquipment,
     openIndividualEV,
     openIndividualChiller,
     openIndividualAhu,
@@ -212,6 +214,32 @@ function App() {
 
 
   // Helper to open EV panel with smart positioning (now from hook)
+
+  // Handler to open faulty equipment panel
+  const handleOpenFaultyEquipment = useCallback((item) => {
+    switch (item.type) {
+      case 'EV Charging Station':
+        openIndividualEV(item.index);
+        break;
+      case 'Chiller':
+        openIndividualChiller(item.index);
+        break;
+      case 'AHU':
+        openIndividualAhu(item.index);
+        break;
+      case 'Electrical Panel':
+        openIndividualElectrical(item.index);
+        break;
+      case 'Water Pump':
+        openIndividualPump(item.index);
+        break;
+      case 'Fire Alarm':
+        openIndividualFire(item.index);
+        break;
+      default:
+        console.warn('Unknown equipment type:', item.type);
+    }
+  }, [openIndividualEV, openIndividualChiller, openIndividualAhu, openIndividualElectrical, openIndividualPump, openIndividualFire]);
 
   // Camera control functions
   const handleCameraHome = useCallback(() => {
@@ -375,6 +403,12 @@ function App() {
             {toast.message}
           </div>
         )}
+
+        {/* Faulty Equipment Alert Panel */}
+        <FaultyEquipmentPanel 
+          faultyEquipment={faultyEquipment} 
+          onOpenFaultyEquipment={handleOpenFaultyEquipment} 
+        />
 
         {/* Sidebar (draggable) */}
         {sidebarVisible && (

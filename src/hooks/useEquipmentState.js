@@ -213,6 +213,96 @@ export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel
     return { total, charging, available, fault };
   }, [evStations]);
 
+  // Collect all faulty equipment
+  const faultyEquipment = useMemo(() => {
+    const faulty = [];
+    
+    // Check EV Stations
+    evStations.forEach((station, index) => {
+      if (station.status === 'fault' || station.accidentType === 'fuseDrop') {
+        faulty.push({
+          type: 'EV Charging Station',
+          name: station.name,
+          id: station.id,
+          status: station.accidentType === 'fuseDrop' ? 'Fuse Drop' : 'Fault',
+          index
+        });
+      }
+    });
+    
+    // Check Chillers
+    chillers.forEach((chiller, index) => {
+      if (chiller.status === 'fault' || (chiller.alert && chiller.alert !== 'Loading...' && chiller.alert !== 'None' && chiller.alert.trim() !== '')) {
+        faulty.push({
+          type: 'Chiller',
+          name: chiller.name,
+          id: chiller.id,
+          status: chiller.status === 'fault' ? 'Fault' : 'Alert',
+          alert: chiller.alert,
+          index
+        });
+      }
+    });
+    
+    // Check AHUs
+    ahus.forEach((ahu, index) => {
+      if (ahu.status === 'fault' || (ahu.alert && ahu.alert !== 'Loading...' && ahu.alert !== 'None' && ahu.alert.trim() !== '')) {
+        faulty.push({
+          type: 'AHU',
+          name: ahu.name,
+          id: ahu.id,
+          status: ahu.status === 'fault' ? 'Fault' : 'Alert',
+          alert: ahu.alert,
+          index
+        });
+      }
+    });
+    
+    // Check Electrical
+    electricals.forEach((electrical, index) => {
+      if (electrical.status === 'fault' || (electrical.alert && electrical.alert !== 'Loading...' && electrical.alert !== 'None' && electrical.alert.trim() !== '')) {
+        faulty.push({
+          type: 'Electrical Panel',
+          name: electrical.name,
+          id: electrical.id,
+          status: electrical.status === 'fault' ? 'Fault' : 'Alert',
+          alert: electrical.alert,
+          index
+        });
+      }
+    });
+    
+    // Check Pumps
+    pumps.forEach((pump, index) => {
+      if (pump.status === 'fault' || (pump.alert && pump.alert !== 'Loading...' && pump.alert !== 'None' && pump.alert.trim() !== '')) {
+        faulty.push({
+          type: 'Water Pump',
+          name: pump.name,
+          id: pump.id,
+          status: pump.status === 'fault' ? 'Fault' : 'Alert',
+          alert: pump.alert,
+          index
+        });
+      }
+    });
+    
+    // Check Fires
+    fires.forEach((fire, index) => {
+      if (fire.status === 'fault' || (fire.alert && fire.alert !== 'Loading...' && fire.alert !== 'None' && fire.alert.trim() !== '')) {
+        faulty.push({
+          type: 'Fire Alarm',
+          name: fire.name,
+          id: fire.id,
+          status: fire.status === 'fault' ? 'Fault' : 'Alert',
+          alert: fire.alert,
+          index
+        });
+      }
+    });
+    
+    return faulty;
+  }, [evStations, chillers, ahus, electricals, pumps, fires]);
+
   // Handlers to open individual unit panels
   const openIndividualEV = useCallback((index) => {
     const unitId = `ev-${index}`;
@@ -400,6 +490,7 @@ export function useEquipmentState(showToast, token, setToken, isDraggingAnyPanel
     pumpIndicators,
     fireIndicators,
     evSummary,
+    faultyEquipment,
 
     // Handlers
     openIndividualEV,
