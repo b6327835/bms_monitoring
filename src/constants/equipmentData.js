@@ -48,3 +48,30 @@ export const initialFires = Array.from({ length: 15 }, (_, i) => ({
   runtime: 'Continuous',
   alert: i === 7 ? 'Sensor failure' : 'None'
 }));
+
+export const initialEvStations = Array.from({ length: 30 }, (_, i) => {
+  const base = [
+    { type: 'Fast Charger', status: 'charging', power: '45.2 kW', usageTime: '1:25:10', temp: '42°C', connector: 'CCS2', voltage: { v1: 228, v2: 230, v3: 229 } },
+    { type: 'Fast Charger', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '28°C', connector: 'CCS2', voltage: { v1: 230, v2: 231, v3: 229 } },
+    { type: 'Standard', status: 'charging', power: '22.5 kW', usageTime: '2:15:45', temp: '38°C', connector: 'Type 2', voltage: { v1: 229, v2: 228, v3: 230 } },
+    { type: 'Standard', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '29°C', connector: 'Type 2', voltage: { v1: 231, v2: 230, v3: 229 } },
+    { type: 'Fast Charger', status: 'charging', power: '48.7 kW', usageTime: '0:45:30', temp: '45°C', connector: 'CCS2', voltage: { v1: 227, v2: 229, v3: 228 } },
+    { type: 'Standard', status: 'available', power: '0 kW', usageTime: '0:00:00', temp: '27°C', connector: 'Type 2', voltage: { v1: 230, v2: 231, v3: 230 } },
+  ];
+  const t = base[i % base.length];
+  const v1 = t.voltage.v1;
+  const v2 = t.voltage.v2;
+  const v3 = t.voltage.v3;
+  const average = Math.round((v1 + v2 + v3) / 3);
+  return {
+    id: i + 1,
+    name: `EV-${String(i + 1).padStart(2, '0')}`,
+    type: t.type,
+    status: i === 12 || i === 22 ? 'fault' : t.status,
+    power: t.power,
+    usageTime: t.usageTime,
+    temp: t.temp,
+    connector: t.connector,
+    voltage: { v1, v2, v3, average }
+  };
+});
