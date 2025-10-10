@@ -19,7 +19,9 @@ export function useEquipmentState(showToast, token) {
 
   // Fetch data from backend
   useEffect(() => {
-    if (token) {
+    if (!token) return;
+
+    const fetchData = () => {
       fetch('http://localhost:5000/equipment-data', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -43,7 +45,15 @@ export function useEquipmentState(showToast, token) {
           }
         })
         .catch(err => console.error('Failed to fetch equipment data:', err));
-    }
+    };
+
+    // Fetch immediately
+    fetchData();
+
+    // Poll every 5 seconds
+    const interval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
   // Individual unit panels
