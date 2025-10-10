@@ -2,7 +2,7 @@ import './App.css';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import BuildingModel from './components/BuildingModel';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import commitHash from './version';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires } from './constants/equipmentData';
@@ -11,6 +11,45 @@ import IndividualUnitPanels from './components/IndividualUnitPanels';
 import { useEquipmentState } from './hooks/useEquipmentState';
 import { usePanelState } from './hooks/usePanelState';
 import { showToast as showToastUtil } from './utils/panelUtils';
+
+function LoginForm({ onLogin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5000/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        onLogin(data.token);
+      } else {
+        alert('Login failed: ' + data.message);
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <form onSubmit={handleSubmit} style={{ background: 'white', padding: '20px', borderRadius: '8px' }}>
+        <h2>Login</h2>
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+      </form>
+    </div>
+  );
+}
 
 function OffscreenClock() {
   const spanRef = React.useRef(null);
@@ -29,6 +68,8 @@ function OffscreenClock() {
 }
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
   const [opacity, setOpacity] = useState(0.5);
   const [showBuilding, setShowBuilding] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
@@ -132,7 +173,7 @@ function App() {
     handleRandomAccident,
     handleRandomEVFuseDrop,
     handleFixAllAccident
-  } = useEquipmentState(showToast);
+  } = useEquipmentState(showToast, token);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
@@ -279,6 +320,10 @@ function App() {
       </Draggable>
     );
   });
+
+  if (!token) {
+    return <LoginForm onLogin={setToken} />;
+  }
 
   return (
     <div className="App">

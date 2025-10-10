@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { handleRandomAccident, handleRandomEVFuseDrop, handleFixAllAccident } from '../utils/accidentHandlers';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires, initialEvStations } from '../constants/equipmentData';
 
-export function useEquipmentState(showToast) {
+export function useEquipmentState(showToast, token) {
   // EV Stations data
   const [evStations, setEvStations] = useState(initialEvStations);
 
@@ -16,6 +16,35 @@ export function useEquipmentState(showToast) {
   const [pumps, setPumps] = useState(initialPumps);
 
   const [fires, setFires] = useState(initialFires);
+
+  // Fetch data from backend
+  useEffect(() => {
+    if (token) {
+      fetch('http://localhost:5000/equipment-data', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data) {
+            // Group by type and sort by ID to match array indices
+            const evData = data.data.filter(d => d.equipment_type === 'evcharger').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const chillerData = data.data.filter(d => d.equipment_type === 'chiller').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const ahuData = data.data.filter(d => d.equipment_type === 'ahu').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const electricalData = data.data.filter(d => d.equipment_type === 'electrical').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const pumpData = data.data.filter(d => d.equipment_type === 'pump').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const fireData = data.data.filter(d => d.equipment_type === 'fire').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+
+            if (evData.length) setEvStations(evData);
+            if (chillerData.length) setChillers(chillerData);
+            if (ahuData.length) setAhus(ahuData);
+            if (electricalData.length) setElectricals(electricalData);
+            if (pumpData.length) setPumps(pumpData);
+            if (fireData.length) setFires(fireData);
+          }
+        })
+        .catch(err => console.error('Failed to fetch equipment data:', err));
+    }
+  }, [token]);
 
   // Individual unit panels
   const [openEVUnits, setOpenEVUnits] = useState({});
