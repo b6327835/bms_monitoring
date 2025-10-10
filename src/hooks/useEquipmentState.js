@@ -24,6 +24,7 @@ export function useEquipmentState(showToast, token) {
     if (!token) return;
 
     const fetchData = () => {
+      setIsFetching(true);
       fetch('http://localhost:5000/equipment-data', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -98,8 +99,12 @@ export function useEquipmentState(showToast, token) {
             if (pumpArray.length) setPumps(pumpArray);
             if (fireArray.length) setFires(fireArray);
           }
+          setIsFetching(false);
         })
-        .catch(err => console.error('Failed to fetch equipment data:', err));
+        .catch(err => {
+          console.error('Failed to fetch equipment data:', err);
+          setIsFetching(false);
+        });
     };
 
     // Fetch immediately
@@ -292,6 +297,8 @@ export function useEquipmentState(showToast, token) {
     setPumps,
     fires,
     setFires,
+
+    isFetching,
 
     // Individual unit panels
     openEVUnits,

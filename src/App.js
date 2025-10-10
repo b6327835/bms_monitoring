@@ -145,6 +145,7 @@ function App() {
     setPumps,
     fires,
     setFires,
+    isFetching,
     openEVUnits,
     setOpenEVUnits,
     openChillerUnits,
@@ -335,6 +336,7 @@ function App() {
             <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
           </div>
           <div style={{ opacity: 0.8 }}>{commitHash.slice(0,7)}</div>
+          {isFetching && <div style={{ opacity: 0.8, color: '#f59e0b', fontWeight: 600 }}>⟳</div>}
         </div>
 
         {/* Camera Controls - Vertical Dock (Top Right) */}
