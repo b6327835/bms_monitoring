@@ -17,6 +17,8 @@ export function useEquipmentState(showToast, token) {
 
   const [fires, setFires] = useState(initialFires);
 
+  const [isFetching, setIsFetching] = useState(false);
+
   // Fetch data from backend
   useEffect(() => {
     if (!token) return;
@@ -29,19 +31,72 @@ export function useEquipmentState(showToast, token) {
         .then(data => {
           if (data.data) {
             // Group by type and sort by ID to match array indices
-            const evData = data.data.filter(d => d.equipment_type === 'evcharger').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            const chillerData = data.data.filter(d => d.equipment_type === 'chiller').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            const ahuData = data.data.filter(d => d.equipment_type === 'ahu').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            const electricalData = data.data.filter(d => d.equipment_type === 'electrical').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            const pumpData = data.data.filter(d => d.equipment_type === 'pump').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
-            const fireData = data.data.filter(d => d.equipment_type === 'fire').map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            const evData = data.data.filter(d => d.equipment_type === 'evcharger')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const evArray = Object.values(evData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            
+            const chillerData = data.data.filter(d => d.equipment_type === 'chiller')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const chillerArray = Object.values(chillerData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            
+            const ahuData = data.data.filter(d => d.equipment_type === 'ahu')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const ahuArray = Object.values(ahuData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            
+            const electricalData = data.data.filter(d => d.equipment_type === 'electrical')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const electricalArray = Object.values(electricalData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            
+            const pumpData = data.data.filter(d => d.equipment_type === 'pump')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const pumpArray = Object.values(pumpData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
+            
+            const fireData = data.data.filter(d => d.equipment_type === 'fire')
+              .reduce((acc, curr) => {
+                const key = curr.equipment_id;
+                if (!acc[key] || new Date(curr.timestamp) > new Date(acc[key].timestamp)) {
+                  acc[key] = curr;
+                }
+                return acc;
+              }, {});
+            const fireArray = Object.values(fireData).map(d => ({ ...d.sensor_data, id: parseInt(d.equipment_id.split('-')[1]), name: d.equipment_id })).sort((a, b) => a.id - b.id);
 
-            if (evData.length) setEvStations(evData);
-            if (chillerData.length) setChillers(chillerData);
-            if (ahuData.length) setAhus(ahuData);
-            if (electricalData.length) setElectricals(electricalData);
-            if (pumpData.length) setPumps(pumpData);
-            if (fireData.length) setFires(fireData);
+            if (evArray.length) setEvStations(evArray);
+            if (chillerArray.length) setChillers(chillerArray);
+            if (ahuArray.length) setAhus(ahuArray);
+            if (electricalArray.length) setElectricals(electricalArray);
+            if (pumpArray.length) setPumps(pumpArray);
+            if (fireArray.length) setFires(fireArray);
           }
         })
         .catch(err => console.error('Failed to fetch equipment data:', err));
