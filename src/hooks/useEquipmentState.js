@@ -25,7 +25,7 @@ export function useEquipmentState(showToast, token) {
 
     const fetchData = () => {
       setIsFetching(true);
-      fetch('http://localhost:5000/equipment-data', {
+      fetch('https://bms-backend-rust.vercel.app/equipment-data', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
