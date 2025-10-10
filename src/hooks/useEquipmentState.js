@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { handleRandomAccident, handleRandomEVFuseDrop, handleFixAllAccident } from '../utils/accidentHandlers';
 import { initialChillers, initialAhus, initialElectricals, initialPumps, initialFires, initialEvStations } from '../constants/equipmentData';
 
-export function useEquipmentState(showToast, token) {
+export function useEquipmentState(showToast, token, setToken) {
   // EV Stations data
   const [evStations, setEvStations] = useState(initialEvStations);
 
@@ -28,7 +28,17 @@ export function useEquipmentState(showToast, token) {
       fetch('https://bms-backend-rust.vercel.app/equipment-data', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            if (res.status === 401) {
+              localStorage.removeItem('token');
+              setToken('');
+              showToast('Session expired. Please log in again.', 'warning');
+            }
+            throw new Error(`HTTP ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
           if (data.data) {
             // Group by type and sort by ID to match array indices

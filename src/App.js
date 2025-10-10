@@ -27,11 +27,11 @@ function LoginForm({ onLogin }) {
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      if (data.token) {
+      if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
         onLogin(data.token);
       } else {
-        alert('Login failed: ' + data.message);
+        alert('Login failed: ' + (data.message || 'Unknown error'));
       }
     } catch (err) {
       alert('Error: ' + err.message);
@@ -174,7 +174,7 @@ function App() {
     handleRandomAccident,
     handleRandomEVFuseDrop,
     handleFixAllAccident
-  } = useEquipmentState(showToast, token);
+  } = useEquipmentState(showToast, token, setToken);
 
   // Store scroll positions for all panels at parent level
   const scrollPositions = React.useRef({
