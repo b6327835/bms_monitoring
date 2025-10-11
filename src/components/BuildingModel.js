@@ -38,14 +38,30 @@ function BuildingShell({ opacity = 0.3 }) {
           >
             <meshPhongMaterial
               color={i % 2 === 0 ? 0xf0f0f0 : 0xe0e0e0}
+              emissive={i % 2 === 0 ? 0x101010 : 0x080808}
+              emissiveIntensity={0.1}
               transparent
               opacity={opacity}
-              side={THREE.DoubleSide}
+              shininess={30}
+              specular={0x222222}
+              side={THREE.FrontSide}
+              depthWrite={true}
+              polygonOffset={true}
+              polygonOffsetFactor={1}
+              polygonOffsetUnits={1}
             />
           </Plane>
           {i < 4 && (
             <Box args={[62, 0.2, 32]} position={[0, i * 8 + 4, 0]} castShadow receiveShadow>
-              <meshPhongMaterial color={0xaaaaaa} transparent opacity={opacity} />
+              <meshPhongMaterial 
+                color={0x888888} 
+                emissive={0x080808}
+                emissiveIntensity={0.05}
+                transparent 
+                opacity={opacity}
+                shininess={20}
+                specular={0x111111}
+              />
             </Box>
           )}
         </group>
@@ -266,17 +282,162 @@ export default function BuildingModel({
     return positions;
   }, []);
 
+  const floors = React.useMemo(() => new Array(5).fill(0), []);
+
   return (
     <group>
-      {/* Lighting approximating the reference */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[50, 50, 50]} intensity={0.8} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
+      {/* Enhanced Lighting Setup */}
+      <ambientLight intensity={0.4} color="#ffffff" />
+      <directionalLight
+        position={[50, 50, 50]}
+        intensity={0.6}
+        color="#ffffff"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={200}
+        shadow-camera-left={-100}
+        shadow-camera-right={100}
+        shadow-camera-top={100}
+        shadow-camera-bottom={-100}
+      />
+      <directionalLight
+        position={[-30, 40, 30]}
+        intensity={0.3}
+        color="#e8f4fd"
+      />
+      <directionalLight
+        position={[30, 40, -30]}
+        intensity={0.2}
+        color="#fdf6e8"
+      />
+
+      {/* Point lights for ambient illumination */}
+      <pointLight position={[-25, 35, 15]} intensity={0.4} color="#ffffff" distance={50} />
+      <pointLight position={[25, 35, 15]} intensity={0.4} color="#ffffff" distance={50} />
+      <pointLight position={[0, 35, -15]} intensity={0.3} color="#f0f8ff" distance={40} />
+
+      {/* Accent lights for equipment areas */}
+      <pointLight position={[-20, 32, 0]} intensity={0.2} color="#87ceeb" distance={20} />
+      <pointLight position={[25, 32, 0]} intensity={0.2} color="#ffa500" distance={20} />
+      <pointLight position={[0, 8, 8]} intensity={0.2} color="#98fb98" distance={25} />
+
+      {/* Spot lights for focused illumination */}
+      <spotLight
+        position={[-15, 35, 10]}
+        target-position={[-15, 0, 10]}
+        intensity={0.5}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={40}
+        castShadow
+      />
+      <spotLight
+        position={[15, 35, 10]}
+        target-position={[15, 0, 10]}
+        intensity={0.4}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={40}
+        castShadow
+      />
+
+      {/* Floor-level lighting for better floor illumination */}
+      {floors.map((_, i) => (
+        <group key={`floor-light-${i}`}>
+          {/* Ceiling lights above each floor */}
+          <pointLight
+            position={[-20, i * 8 + 7.5, 10]}
+            intensity={0.15}
+            color="#f5f5f5"
+            distance={25}
+          />
+          <pointLight
+            position={[20, i * 8 + 7.5, 10]}
+            intensity={0.15}
+            color="#f5f5f5"
+            distance={25}
+          />
+          <pointLight
+            position={[0, i * 8 + 7.5, -10]}
+            intensity={0.12}
+            color="#f0f8ff"
+            distance={30}
+          />
+
+          {/* Floor glow lights (subtle illumination from below) */}
+          <pointLight
+            position={[-15, i * 8 + 0.1, 8]}
+            intensity={0.08}
+            color="#e6f3ff"
+            distance={20}
+          />
+          <pointLight
+            position={[15, i * 8 + 0.1, 8]}
+            intensity={0.08}
+            color="#fff8e6"
+            distance={20}
+          />
+        </group>
+      ))}
+
+      {/* Recessed ceiling lighting effects */}
+      {floors.map((_, i) => (
+        <group key={`ceiling-lights-${i}`}>
+          {/* Recessed light fixtures (visible emissive rectangles) */}
+          <Box args={[2, 0.1, 2]} position={[-25, i * 8 + 7.9, 12]} castShadow>
+            <meshPhongMaterial 
+              color={0x333333} 
+              emissive={0xffffff}
+              emissiveIntensity={0.3}
+            />
+          </Box>
+          <Box args={[2, 0.1, 2]} position={[25, i * 8 + 7.9, 12]} castShadow>
+            <meshPhongMaterial 
+              color={0x333333} 
+              emissive={0xffffff}
+              emissiveIntensity={0.3}
+            />
+          </Box>
+          <Box args={[2, 0.1, 2]} position={[-25, i * 8 + 7.9, -8]} castShadow>
+            <meshPhongMaterial 
+              color={0x333333} 
+              emissive={0xf0f8ff}
+              emissiveIntensity={0.25}
+            />
+          </Box>
+          <Box args={[2, 0.1, 2]} position={[25, i * 8 + 7.9, -8]} castShadow>
+            <meshPhongMaterial 
+              color={0x333333} 
+              emissive={0xfff8dc}
+              emissiveIntensity={0.25}
+            />
+          </Box>
+        </group>
+      ))}
 
       {/* Building */}
       {showBuilding && <BuildingShell opacity={opacity} />}
 
-      {/* Grid */}
-      {showGrid && <gridHelper args={[150, 30, '#444444', '#222222']} position={[0, 0, 0]} />}
+      {/* Grid with enhanced ground plane */}
+      {showGrid && (
+        <>
+          {/* Enhanced ground plane for better light reception */}
+          <Plane args={[150, 150]} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+            <meshPhongMaterial 
+              color={0x1a1a1a}
+              emissive={0x050505}
+              emissiveIntensity={0.15}
+              shininess={10}
+              specular={0x0a0a0a}
+              side={THREE.FrontSide}
+            />
+          </Plane>
+          <gridHelper args={[150, 30, '#666666', '#333333']} position={[0, 0, 0]} />
+        </>
+      )}
 
       {/* EV stations */}
       {showEV && evPositions.map((p, i) => (
@@ -331,6 +492,18 @@ export default function BuildingModel({
           </AnimatedGroup>
         </group>
       ))}
+
+      {/* Ground-level perimeter lighting */}
+      <pointLight position={[-60, 2, 0]} intensity={0.2} color="#4a90e2" distance={80} />
+      <pointLight position={[60, 2, 0]} intensity={0.2} color="#e27d4a" distance={80} />
+      <pointLight position={[0, 2, -60]} intensity={0.15} color="#e8f4fd" distance={80} />
+      <pointLight position={[0, 2, 60]} intensity={0.15} color="#fdf6e8" distance={80} />
+
+      {/* Ground corner accent lights */}
+      <pointLight position={[-50, 1, -50]} intensity={0.12} color="#ffffff" distance={60} />
+      <pointLight position={[50, 1, -50]} intensity={0.12} color="#ffffff" distance={60} />
+      <pointLight position={[-50, 1, 50]} intensity={0.12} color="#ffffff" distance={60} />
+      <pointLight position={[50, 1, 50]} intensity={0.12} color="#ffffff" distance={60} />
     </group>
   );
 }
