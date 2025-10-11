@@ -535,8 +535,8 @@ function App() {
     <div className="App">
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Small top-left title and datetime */}
-        <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 8 }}>
-          <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ position: 'absolute', top: '0.51rem', left: '0.68rem', zIndex: 3, color: '#e5e7eb', fontSize: '0.68rem' }}>
+          <div style={{ display: 'flex', gap: '0.51rem' }}>
             <div style={{ fontWeight: 600 }}>3D Building Simulation - BMS Monitoring (WIP)</div>
             <div style={{ opacity: 0.8 }}><OffscreenClock /></div>
           </div>
@@ -545,41 +545,41 @@ function App() {
         </div>
 
         {/* Camera Controls - Vertical Dock (Top Right) */}
-        <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 4, display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(17,24,39,0.4)', padding: 6, borderRadius: 8, border: '1px solid rgba(31,41,55,0.5)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-          <button title="Reset Camera" onClick={handleCameraHome} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏠</button>
+        <div style={{ position: 'absolute', top: '0.68rem', right: '0.68rem', zIndex: 4, display: 'flex', flexDirection: 'column', gap: '0.51rem', background: 'rgba(17,24,39,0.4)', padding: '0.51rem', borderRadius: '0.51rem', border: '1px solid rgba(31,41,55,0.5)', boxShadow: '0 5px 16px rgba(0,0,0,0.2)' }}>
+          <button title="Reset Camera" onClick={handleCameraHome} style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: '1.35rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏠</button>
           <button 
             title="Zoom In (Hold to zoom continuously)" 
             onMouseDown={() => startZoom('in')} 
             onMouseUp={stopZoom} 
             onMouseLeave={stopZoom}
-            style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: '1.52rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >+</button>
           <button 
             title="Zoom Out (Hold to zoom continuously)" 
             onMouseDown={() => startZoom('out')} 
             onMouseUp={stopZoom} 
             onMouseLeave={stopZoom}
-            style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: '1.52rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >−</button>
-          <button title="Accident" onClick={toggleAccident} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #7f1d1d', background: '#7f1d1d', color: 'white', fontWeight: 800, fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>A</button>
+          <button title="Accident" onClick={toggleAccident} style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid #7f1d1d', background: '#7f1d1d', color: 'white', fontWeight: 800, fontSize: '0.93rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>A</button>
         </div>
 
         {/* Transparency slider - above bottom-left dock */}
         <div style={{
           position: 'absolute',
-          bottom: '68px',
-          left: '16px',
+          bottom: '92px',
+          left: '22px',
           zIndex: 4,
           background: 'rgba(17,24,39,0.8)',
-          padding: '6px 10px',
-          borderRadius: '8px',
+          padding: '9px 14px',
+          borderRadius: '11px',
           border: '1px solid #1f2937',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          boxShadow: '0 5px 16px rgba(0,0,0,0.3)',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '11px'
         }}>
-          <label htmlFor="opacity" style={{ color: '#e5e7eb', fontSize: 11, fontWeight: 600 }}>Opacity:</label>
+          <label htmlFor="opacity" style={{ color: '#e5e7eb', fontSize: 15, fontWeight: 600 }}>Opacity:</label>
           <input
             id="opacity"
             type="range"
@@ -588,27 +588,27 @@ function App() {
             step="0.01"
             value={opacity}
             onChange={(e) => setOpacity(parseFloat(e.target.value))}
-            style={{ width: '100px' }}
+            style={{ width: '135px' }}
           />
-          <span style={{ color: '#9ca3af', fontSize: 10, minWidth: '30px' }}>{Math.round(opacity * 100)}%</span>
+          <span style={{ color: '#9ca3af', fontSize: 14, minWidth: '41px' }}>{Math.round(opacity * 100)}%</span>
         </div>
 
         {/* Bottom-left dock buttons (dark/compact) */}
-        <div style={{ position: 'absolute', bottom: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
-          <button title="Sidebar" onClick={toggleSidebarWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
-          <button title="Floors" onClick={toggleFloorsWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
-          <button title="Equipment Overview" onClick={toggleEquipmentOverviewWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
-          <button title="Filter" onClick={toggleFilterWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
-          <button title="EV Panel" onClick={toggleEVWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
+        <div style={{ position: 'absolute', bottom: '22px', left: '22px', display: 'flex', gap: '11px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 9, borderRadius: 14, border: '1px solid #1f2937', boxShadow: '0 11px 27px rgba(0,0,0,0.35)' }}>
+          <button title="Sidebar" onClick={toggleSidebarWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>S</button>
+          <button title="Floors" onClick={toggleFloorsWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>FL</button>
+          <button title="Equipment Overview" onClick={toggleEquipmentOverviewWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EQ</button>
+          <button title="Filter" onClick={toggleFilterWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>F</button>
+          <button title="EV Panel" onClick={toggleEVWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EV</button>
         </div>
 
         {/* Accident Controls Panel (draggable) */}
         {accidentOpen && (
-          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={200} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('accident')} onPanelClick={bringPanelToFront}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button onClick={handleRandomAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random accident</button>
-              <button onClick={handleRandomEVFuseDrop} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random Drop EV Fuse</button>
-              <button onClick={handleFixAllAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#0b3d0b', color: '#bbf7d0', cursor: 'pointer', fontWeight: 800, fontSize: 12 }}>Fix ALL Accident</button>
+          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={270} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('accident')} onPanelClick={bringPanelToFront}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
+              <button onClick={handleRandomAccident} style={{ padding: '11px 14px', borderRadius: '11px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 16 }}>Random accident</button>
+              <button onClick={handleRandomEVFuseDrop} style={{ padding: '11px 14px', borderRadius: '11px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 16 }}>Random Drop EV Fuse</button>
+              <button onClick={handleFixAllAccident} style={{ padding: '11px 14px', borderRadius: '11px', border: '1px solid #374151', background: '#0b3d0b', color: '#bbf7d0', cursor: 'pointer', fontWeight: 800, fontSize: 16 }}>Fix ALL Accident</button>
             </div>
           </DraggablePanel>
         )}
@@ -617,17 +617,17 @@ function App() {
         {toast.visible && (
           <div style={{
             position: 'absolute',
-            bottom: '16px',
+            bottom: '22px',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 4,
             background: toast.type === 'danger' ? '#dc2626' : (toast.type === 'warning' ? '#f59e0b' : '#10b981'),
             color: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 10px 28px rgba(0,0,0,0.4)',
-            padding: '8px 12px',
+            borderRadius: '14px',
+            boxShadow: '0 14px 38px rgba(0,0,0,0.4)',
+            padding: '11px 16px',
             fontWeight: 800,
-            fontSize: 12,
+            fontSize: 16,
             maxWidth: '80vw'
           }}>
             {toast.message}
@@ -642,29 +642,29 @@ function App() {
 
         {/* Sidebar (draggable) */}
         {sidebarVisible && (
-          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('sidebar')} onPanelClick={bringPanelToFront}>
-            <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '6px', marginBottom: '8px', color: '#e5e7eb' }}>System Status</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={297} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('sidebar')} onPanelClick={bringPanelToFront}>
+            <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '9px', marginBottom: '11px', color: '#e5e7eb' }}>System Status</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '11px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '11px', borderRadius: '11px', borderLeft: '4px solid #10b981' }}>
                 <span>BMS</span><span style={{ color: '#10b981', fontWeight: 800 }}>Normal</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '11px', borderRadius: '11px', borderLeft: '4px solid #10b981' }}>
                 <span>Electrical</span><span style={{ color: '#10b981', fontWeight: 800 }}>Normal</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '11px', borderRadius: '11px', borderLeft: '4px solid #f59e0b' }}>
                 <span>HVAC</span><span style={{ color: '#f59e0b', fontWeight: 800 }}>Check</span>
               </div>
             </div>
-            <div style={{ fontSize: 11, color: '#9ca3af' }}>Use the dock to access floors and equipment overviews.</div>
+            <div style={{ fontSize: 15, color: '#9ca3af' }}>Use the dock to access floors and equipment overviews.</div>
           </DraggablePanel>
         )}
 
         {/* Floors panel (draggable) */}
         {floorsVisible && (
-          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('floors')} onPanelClick={bringPanelToFront}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={297} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('floors')} onPanelClick={bringPanelToFront}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
               {['All Overview','Floor 1 - Lobby & EV','Floor 2 - Office','Floor 3 - Data Center','Floor 4 - Mechanical','Floor 5 - Rooftop'].map((t, i) => (
-                <button key={i} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'left', fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>{t}</button>
+                <button key={i} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', textAlign: 'left', fontWeight: 700, cursor: 'pointer', fontSize: 16 }}>{t}</button>
               ))}
             </div>
           </DraggablePanel>
@@ -672,31 +672,31 @@ function App() {
 
         {/* Equipment overview panel (draggable) */}
         {equipmentOverviewVisible && (
-          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('equipmentOverview')} onPanelClick={bringPanelToFront}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <button onClick={toggleChillerPanelWrapped} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={311} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('equipmentOverview')} onPanelClick={bringPanelToFront}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+              <button onClick={toggleChillerPanelWrapped} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
-                <span className={chillerIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
+                <span className={chillerIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
               </button>
-              <button onClick={toggleAhuPanelWrapped} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleAhuPanelWrapped} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>AHU Units (12)</span>
-                <span className={ahuIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={ahuIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleElectricalPanelWrapped} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleElectricalPanelWrapped} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>Electrical Panel (8)</span>
-                <span className={electricalIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={electricalIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={togglePumpPanelWrapped} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={togglePumpPanelWrapped} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>Water Pump System (6)</span>
-                <span className={pumpIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={pumpIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleFirePanelWrapped} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleFirePanelWrapped} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>Fire Alarm System (15)</span>
-                <span className={fireIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={fireIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={openEVPanel} style={{ background: evPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={openEVPanel} style={{ background: evPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 16 }}>
                 <span style={{ fontWeight: 700 }}>EV Charging Stations (30)</span>
-                <span className={evStations.some(s => s.status === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
+                <span className={evStations.some(s => s.status === 'fault') ? 'fault-indicator' : ''} style={{ width: '14px', height: '14px', borderRadius: '50%', background: evStations.some(s => s.status === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
             </div>
           </DraggablePanel>
@@ -785,11 +785,11 @@ function App() {
 
         {/* Equipment Filter panel (draggable) */}
         {filterVisible && (
-          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={180} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('filter')} onPanelClick={bringPanelToFront}>
+          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={243} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('filter')} onPanelClick={bringPanelToFront}>
             {[{label:'Chiller', state: showChiller, set:setShowChiller, color:'#3498db'}, {label:'AHU', state: showAHU, set:setShowAHU, color:'#2ecc71'}, {label:'Electrical', state: showElectrical, set:setShowElectrical, color:'#f39c12'}, {label:'Water Pump', state: showPump, set:setShowPump, color:'#9b59b6'}, {label:'Fire Alarm', state: showFire, set:setShowFire, color:'#e74c3c'}, {label:'EV Charging', state: showEV, set:setShowEV, color:'#1abc9c'}].map((it, idx) => (
-              <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
-                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: it.color }} />
-                <span style={{ flex: 1, color: '#e5e7eb', fontSize: 12 }}>{it.label}</span>
+              <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '9px 0' }}>
+                <span style={{ width: '16px', height: '16px', borderRadius: '4px', background: it.color }} />
+                <span style={{ flex: 1, color: '#e5e7eb', fontSize: 16 }}>{it.label}</span>
                 <input type="checkbox" checked={it.state} onChange={(e) => it.set(e.target.checked)} />
               </label>
             ))}
@@ -797,60 +797,60 @@ function App() {
         )}
 
         {evPanelOpen && (
-          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('ev')} onPanelClick={bringPanelToFront}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: 8 }}>
-              <div style={{ background: '#0b1220', borderLeft: '3px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.total}</div>
-                <div style={{ fontSize: '11px', color: '#9ca3af' }}>Total</div>
+          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={513} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('ev')} onPanelClick={bringPanelToFront}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '11px', marginBottom: 11 }}>
+              <div style={{ background: '#0b1220', borderLeft: '4px solid #1f2937', borderRadius: '11px', padding: '11px', textAlign: 'center' }}>
+                <div style={{ fontSize: '25px', fontWeight: 800 }}>{evSummary.total}</div>
+                <div style={{ fontSize: '15px', color: '#9ca3af' }}>Total</div>
               </div>
-              <div style={{ background: '#0b1220', borderLeft: '3px solid #f59e0b', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.charging}</div>
-                <div style={{ fontSize: '11px', color: '#9ca3af' }}>Charging</div>
+              <div style={{ background: '#0b1220', borderLeft: '4px solid #f59e0b', borderRadius: '11px', padding: '11px', textAlign: 'center' }}>
+                <div style={{ fontSize: '25px', fontWeight: 800 }}>{evSummary.charging}</div>
+                <div style={{ fontSize: '15px', color: '#9ca3af' }}>Charging</div>
               </div>
-              <div style={{ background: '#0b1220', borderLeft: '3px solid #10b981', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.available}</div>
-                <div style={{ fontSize: '11px', color: '#9ca3af' }}>Available</div>
+              <div style={{ background: '#0b1220', borderLeft: '4px solid #10b981', borderRadius: '11px', padding: '11px', textAlign: 'center' }}>
+                <div style={{ fontSize: '25px', fontWeight: 800 }}>{evSummary.available}</div>
+                <div style={{ fontSize: '15px', color: '#9ca3af' }}>Available</div>
               </div>
-              <div style={{ background: '#0b1220', borderLeft: '3px solid #ef4444', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.fault}</div>
-                <div style={{ fontSize: '11px', color: '#9ca3af' }}>Fault</div>
+              <div style={{ background: '#0b1220', borderLeft: '4px solid #ef4444', borderRadius: '11px', padding: '11px', textAlign: 'center' }}>
+                <div style={{ fontSize: '25px', fontWeight: 800 }}>{evSummary.fault}</div>
+                <div style={{ fontSize: '15px', color: '#9ca3af' }}>Fault</div>
               </div>
             </div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: 6 }}>Stations</div>
+            <div style={{ fontSize: '16px', color: '#9ca3af', marginBottom: 9 }}>Stations</div>
             <div>
               {evStations.map((s) => {
                 const statusColor = s.status === 'charging' ? '#f59e0b' : s.status === 'fault' ? '#ef4444' : '#10b981';
                 const statusText = s.status.charAt(0).toUpperCase() + s.status.slice(1);
                 return (
-                  <div key={s.id} style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', marginBottom: '8px', background: '#0b1220' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <div key={s.id} style={{ border: '1px solid #1f2937', borderRadius: '11px', padding: '11px', marginBottom: '11px', background: '#0b1220' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '9px' }}>
                       <div style={{ fontWeight: 700 }}>{s.name} ({s.type})</div>
-                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                      <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: statusColor }} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '9px', fontSize: '16px' }}>
                       <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                       <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{s.power}</span></div>
                       <div><span style={{ color: '#9ca3af' }}>Usage: </span><span style={{ fontWeight: 600 }}>{s.usageTime}</span></div>
                       <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{s.temp}</span></div>
                       <div><span style={{ color: '#9ca3af' }}>Connector: </span><span style={{ fontWeight: 600 }}>{s.connector}</span></div>
                     </div>
-                    <div style={{ marginTop: '6px' }}>
-                      <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 700, marginBottom: '4px' }}>Voltage (V)</div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                        <div style={{ background: '#111827', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '10px', color: '#9ca3af' }}>V1</div>
+                    <div style={{ marginTop: '9px' }}>
+                      <div style={{ fontSize: '15px', color: '#9ca3af', fontWeight: 700, marginBottom: '5px' }}>Voltage (V)</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '9px' }}>
+                        <div style={{ background: '#111827', borderRadius: '9px', padding: '9px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '14px', color: '#9ca3af' }}>V1</div>
                           <div style={{ fontWeight: 700 }}>{s.voltage.v1}</div>
                         </div>
-                        <div style={{ background: '#111827', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '10px', color: '#9ca3af' }}>V2</div>
+                        <div style={{ background: '#111827', borderRadius: '9px', padding: '9px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '14px', color: '#9ca3af' }}>V2</div>
                           <div style={{ fontWeight: 700 }}>{s.voltage.v2}</div>
                         </div>
-                        <div style={{ background: '#111827', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '10px', color: '#9ca3af' }}>V3</div>
+                        <div style={{ background: '#111827', borderRadius: '9px', padding: '9px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '14px', color: '#9ca3af' }}>V3</div>
                           <div style={{ fontWeight: 700 }}>{s.voltage.v3}</div>
                         </div>
-                        <div style={{ background: '#0ea5a4', borderRadius: '6px', padding: '6px', textAlign: 'center', color: 'white' }}>
-                          <div style={{ fontSize: '10px' }}>Avg</div>
+                        <div style={{ background: '#0ea5a4', borderRadius: '9px', padding: '9px', textAlign: 'center', color: 'white' }}>
+                          <div style={{ fontSize: '14px' }}>Avg</div>
                           <div style={{ fontWeight: 800 }}>{s.voltage.average}</div>
                         </div>
                       </div>

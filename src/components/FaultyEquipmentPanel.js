@@ -8,22 +8,22 @@ function FaultyEquipmentPanel({ faultyEquipment, onOpenFaultyEquipment }) {
   return (
     <div style={{
       position: 'absolute',
-      bottom: '16px',
-      right: '16px',
+      bottom: '22px',
+      right: '22px',
       zIndex: 5,
       background: 'rgba(220, 38, 38, 0.4)',
-      border: '2px solid rgba(153, 27, 27, 0.5)',
-      borderRadius: '6px',
-      padding: '8px',
-      maxWidth: '250px',
-      boxShadow: '0 4px 16px rgba(220, 38, 38, 0.4)',
+      border: '3px solid rgba(153, 27, 27, 0.5)',
+      borderRadius: '9px',
+      padding: '11px',
+      maxWidth: '338px',
+      boxShadow: '0 5px 22px rgba(220, 38, 38, 0.4)',
       animation: 'subtlePulse 3s infinite'
     }}>
       <div style={{
         color: 'white',
         fontWeight: 900,
-        fontSize: '12px',
-        marginBottom: '6px',
+        fontSize: '16px',
+        marginBottom: '9px',
         textAlign: 'center',
         textTransform: 'uppercase',
         letterSpacing: '0.5px'
@@ -32,7 +32,7 @@ function FaultyEquipmentPanel({ faultyEquipment, onOpenFaultyEquipment }) {
       </div>
       
       <div style={{
-        maxHeight: '200px',
+        maxHeight: '270px',
         overflowY: 'auto',
         scrollbarWidth: 'thin',
         scrollbarColor: '#fca5a5 #dc2626'
@@ -41,9 +41,9 @@ function FaultyEquipmentPanel({ faultyEquipment, onOpenFaultyEquipment }) {
           <div key={`${item.type}-${item.id}`} style={{
             background: 'rgba(255, 255, 255, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '4px',
-            padding: '6px',
-            marginBottom: '4px',
+            borderRadius: '5px',
+            padding: '9px',
+            marginBottom: '5px',
             cursor: 'pointer',
             transition: 'background 0.2s'
           }}
@@ -54,15 +54,15 @@ function FaultyEquipmentPanel({ faultyEquipment, onOpenFaultyEquipment }) {
             <div style={{
               color: 'white',
               fontWeight: 800,
-              fontSize: '11px',
-              marginBottom: '2px'
+              fontSize: '15px',
+              marginBottom: '3px'
             }}>
               {item.type}: {item.name}
             </div>
             <div style={{
               color: '#fed7d7',
               fontWeight: 600,
-              fontSize: '10px',
+              fontSize: '14px',
               display: 'flex',
               justifyContent: 'space-between'
             }}>
@@ -78,8 +78,8 @@ function FaultyEquipmentPanel({ faultyEquipment, onOpenFaultyEquipment }) {
       <style>
         {`
           @keyframes subtlePulse {
-            0%, 100% { box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4); }
-            50% { box-shadow: 0 4px 16px rgba(220, 38, 38, 0.6); }
+            0%, 100% { box-shadow: 0 5px 22px rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 5px 22px rgba(220, 38, 38, 0.6); }
           }
         `}
       </style>

@@ -59,18 +59,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenEVUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'ev')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{ev.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Type: </span><span style={{ fontWeight: 600 }}>{ev.type}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Power: </span><span style={{ fontWeight: 600 }}>{ev.power}</span></div>
@@ -103,18 +103,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenChillerUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'chiller')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{chiller.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{chiller.temp}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{chiller.pressure}</span></div>
@@ -143,18 +143,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenAhuUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'ahu')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{ahu.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{ahu.temp}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{ahu.pressure}</span></div>
@@ -183,18 +183,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenElectricalUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'electrical')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{electrical.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{electrical.temp}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{electrical.pressure}</span></div>
@@ -223,18 +223,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenPumpUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'pump')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{pump.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{pump.temp}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{pump.pressure}</span></div>
@@ -263,18 +263,18 @@ export default function IndividualUnitPanels({
             minimized={unit.minimized}
             setMinimized={(min) => setOpenFireUnits(prev => ({ ...prev, [unit.id]: { ...prev[unit.id], minimized: min } }))}
             onClose={() => closeIndividualUnit(unit.id, 'fire')}
-            width={350}
+            width={438}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             zIndex={getPanelZIndex(unit.id)}
             onPanelClick={bringPanelToFront}
           >
-            <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <div style={{ border: '1px solid #1f2937', borderRadius: '10px', padding: '10px', background: '#0b1220' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700 }}>{fire.name}</div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: statusColor }} />
+                <div style={{ width: '13px', height: '13px', borderRadius: '50%', background: statusColor }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '15px' }}>
                 <div><span style={{ color: '#9ca3af' }}>Status: </span><span style={{ fontWeight: 600 }}>{statusText}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Temp: </span><span style={{ fontWeight: 600 }}>{fire.temp}</span></div>
                 <div><span style={{ color: '#9ca3af' }}>Pressure: </span><span style={{ fontWeight: 600 }}>{fire.pressure}</span></div>
