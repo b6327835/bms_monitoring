@@ -862,7 +862,7 @@ function App() {
           </DraggablePanel>
         )}
         <Canvas 
-          camera={{ position: [8, 2, 8] }} 
+          camera={{ position: [60, 40, 50] }} 
           style={{ background: '#151518ff' }}
           shadows
         >
