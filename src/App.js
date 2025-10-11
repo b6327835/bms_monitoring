@@ -72,7 +72,7 @@ function OffscreenClock() {
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  const [opacity, setOpacity] = useState(0.5);
+  const [opacity, setOpacity] = useState(0.3);
   const [showBuilding, setShowBuilding] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [showEV, setShowEV] = useState(true);
@@ -546,7 +546,7 @@ function App() {
 
         {/* Camera Controls - Vertical Dock (Top Right) */}
         <div style={{ position: 'absolute', top: '0.68rem', right: '0.68rem', zIndex: 4, display: 'flex', flexDirection: 'column', gap: '0.51rem', background: 'rgba(17,24,39,0.4)', padding: '0.51rem', borderRadius: '0.51rem', border: '1px solid rgba(31,41,55,0.5)', boxShadow: '0 5px 16px rgba(0,0,0,0.2)' }}>
-          <button title="Reset Camera" onClick={handleCameraHome} style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: '1.35rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏠</button>
+          <button title="Reset Camera" onClick={handleCameraHome} style={{ width: '2.7rem', height: '2.7rem', borderRadius: '0.51rem', border: '1px solid rgba(55,65,81,0.6)', background: 'rgba(17,24,39,0.6)', color: '#e5e7eb', fontWeight: 700, fontSize: '1.35rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⟲</button>
           <button 
             title="Zoom In (Hold to zoom continuously)" 
             onMouseDown={() => startZoom('in')} 
@@ -595,10 +595,10 @@ function App() {
 
         {/* Bottom-left dock buttons (dark/compact) */}
         <div style={{ position: 'absolute', bottom: '22px', left: '22px', display: 'flex', gap: '11px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 9, borderRadius: 14, border: '1px solid #1f2937', boxShadow: '0 11px 27px rgba(0,0,0,0.35)' }}>
-          <button title="Sidebar" onClick={toggleSidebarWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>S</button>
-          <button title="Floors" onClick={toggleFloorsWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>FL</button>
-          <button title="Equipment Overview" onClick={toggleEquipmentOverviewWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EQ</button>
-          <button title="Filter" onClick={toggleFilterWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>F</button>
+          <button title="System Status" onClick={toggleSidebarWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>SS</button>
+          <button title="Floors" onClick={toggleFloorsWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>F</button>
+          <button title="Equipment Overview" onClick={toggleEquipmentOverviewWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EO</button>
+          <button title="Filter" onClick={toggleFilterWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EQ</button>
           <button title="EV Panel" onClick={toggleEVWrapped} style={{ width: 43, height: 43, borderRadius: 9, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>EV</button>
         </div>
 
@@ -640,9 +640,9 @@ function App() {
           onOpenFaultyEquipment={handleOpenFaultyEquipment} 
         />
 
-        {/* Sidebar (draggable) */}
+        {/* System Status (draggable) */}
         {sidebarVisible && (
-          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={297} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('sidebar')} onPanelClick={bringPanelToFront}>
+          <DraggablePanel panelId="sidebar" title="System Status" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={297} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('sidebar')} onPanelClick={bringPanelToFront}>
             <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '9px', marginBottom: '11px', color: '#e5e7eb' }}>System Status</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '11px', marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '11px', borderRadius: '11px', borderLeft: '4px solid #10b981' }}>
