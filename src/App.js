@@ -527,7 +527,7 @@ function App() {
 
   return (
     <div className="App">
-      <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Small top-left title and datetime */}
         <div style={{ position: 'absolute', top: 6, left: 8, zIndex: 3, color: '#e5e7eb', fontSize: 8 }}>
           <div style={{ display: 'flex', gap: 6 }}>
