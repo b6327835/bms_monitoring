@@ -11,12 +11,6 @@
   overscroll-behavior: none;
 }
 
-body {
-  margin: 0;
-  scroll-behavior: auto;
-  overflow-anchor: none;
-  padding: 0;
-}
 
 @keyframes fault-pulse {
   0% { transform: scale(1); opacity: 1; }
