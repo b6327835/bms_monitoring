@@ -82,6 +82,33 @@ function App() {
   const [showPump, setShowPump] = useState(true);
   const [showFire, setShowFire] = useState(true);
 
+  // Z-index management for panel layering
+  const [panelZIndices, setPanelZIndices] = useState({});
+  const [highestZIndex, setHighestZIndex] = useState(10);
+
+  // Function to bring panel to front
+  const bringPanelToFront = useCallback((panelId) => {
+    setPanelZIndices(prev => ({
+      ...prev,
+      [panelId]: highestZIndex + 1
+    }));
+    setHighestZIndex(prev => prev + 1);
+  }, [highestZIndex]);
+
+  // Function to get or create z-index for a panel
+  const getPanelZIndex = useCallback((panelId) => {
+    if (!panelZIndices[panelId]) {
+      const newZIndex = highestZIndex + 1;
+      setPanelZIndices(prev => ({
+        ...prev,
+        [panelId]: newZIndex
+      }));
+      setHighestZIndex(newZIndex);
+      return newZIndex;
+    }
+    return panelZIndices[panelId];
+  }, [panelZIndices, highestZIndex]);
+
   // Global drag state tracking
   const isDraggingAnyPanel = React.useRef(false);
   const dragCount = React.useRef(0);
@@ -130,7 +157,7 @@ function App() {
     togglePumpPanel,
     toggleFirePanel,
     toggleEV,
-    toggleAccident,
+    toggleAccident: toggleAccidentHook,
     closeAccident,
     closeSidebar,
     closeFilter,
@@ -143,6 +170,93 @@ function App() {
     closePumpPanel,
     closeFirePanel
   } = usePanelState();
+
+  // Custom toggle functions with z-index management
+  const toggleAccident = useCallback(() => {
+    const wasOpen = accidentOpen;
+    toggleAccidentHook();
+    // Bring to front when opening (not closing)
+    if (!wasOpen) {
+      bringPanelToFront('accident');
+    }
+  }, [accidentOpen, toggleAccidentHook, bringPanelToFront]);
+
+  // Wrapper functions for equipment overview panels to bring to front when opened
+  const toggleChillerPanelWrapped = useCallback(() => {
+    const wasOpen = chillerPanelOpen;
+    toggleChillerPanel();
+    if (!wasOpen) {
+      bringPanelToFront('chillerPanel');
+    }
+  }, [chillerPanelOpen, toggleChillerPanel, bringPanelToFront]);
+
+  const toggleAhuPanelWrapped = useCallback(() => {
+    const wasOpen = ahuPanelOpen;
+    toggleAhuPanel();
+    if (!wasOpen) {
+      bringPanelToFront('ahuPanel');
+    }
+  }, [ahuPanelOpen, toggleAhuPanel, bringPanelToFront]);
+
+  const toggleElectricalPanelWrapped = useCallback(() => {
+    const wasOpen = electricalPanelOpen;
+    toggleElectricalPanel();
+    if (!wasOpen) {
+      bringPanelToFront('electricalPanel');
+    }
+  }, [electricalPanelOpen, toggleElectricalPanel, bringPanelToFront]);
+
+  const togglePumpPanelWrapped = useCallback(() => {
+    const wasOpen = pumpPanelOpen;
+    togglePumpPanel();
+    if (!wasOpen) {
+      bringPanelToFront('pumpPanel');
+    }
+  }, [pumpPanelOpen, togglePumpPanel, bringPanelToFront]);
+
+  const toggleFirePanelWrapped = useCallback(() => {
+    const wasOpen = firePanelOpen;
+    toggleFirePanel();
+    if (!wasOpen) {
+      bringPanelToFront('firePanel');
+    }
+  }, [firePanelOpen, toggleFirePanel, bringPanelToFront]);
+
+  // Wrapper functions for dock buttons with Windows taskbar behavior
+  const toggleSidebarWrapped = useCallback(() => {
+    toggleSidebar();
+    if (!sidebarVisible) {
+      bringPanelToFront('sidebar');
+    }
+  }, [sidebarVisible, toggleSidebar, bringPanelToFront]);
+
+  const toggleFloorsWrapped = useCallback(() => {
+    toggleFloors();
+    if (!floorsVisible) {
+      bringPanelToFront('floors');
+    }
+  }, [floorsVisible, toggleFloors, bringPanelToFront]);
+
+  const toggleEquipmentOverviewWrapped = useCallback(() => {
+    toggleEquipmentOverview();
+    if (!equipmentOverviewVisible) {
+      bringPanelToFront('equipmentOverview');
+    }
+  }, [equipmentOverviewVisible, toggleEquipmentOverview, bringPanelToFront]);
+
+  const toggleFilterWrapped = useCallback(() => {
+    toggleFilter();
+    if (!filterVisible) {
+      bringPanelToFront('filter');
+    }
+  }, [filterVisible, toggleFilter, bringPanelToFront]);
+
+  const toggleEVWrapped = useCallback(() => {
+    toggleEV();
+    if (!evPanelOpen) {
+      bringPanelToFront('ev');
+    }
+  }, [evPanelOpen, toggleEV, bringPanelToFront]);
 
   // Create showToast function
   const showToast = useCallback((message, type = 'success') => {
@@ -298,7 +412,35 @@ function App() {
     // Move camera to equipment first
     moveCameraToEquipment(item.type, item.index);
     
-    // Then open the individual panel
+    // Generate panel ID that matches the format used in openIndividual functions
+    let panelId;
+    switch (item.type) {
+      case 'EV Charging Station':
+        panelId = `ev-${item.index}`;
+        break;
+      case 'Chiller':
+        panelId = `chiller-${item.index}`;
+        break;
+      case 'AHU':
+        panelId = `ahu-${item.index}`;
+        break;
+      case 'Electrical Panel':
+        panelId = `electrical-${item.index}`;
+        break;
+      case 'Water Pump':
+        panelId = `pump-${item.index}`;
+        break;
+      case 'Fire Alarm':
+        panelId = `fire-${item.index}`;
+        break;
+      default:
+        panelId = `unknown-${item.index}`;
+    }
+    
+    // Bring the individual panel to front (works even if panel doesn't exist yet)
+    bringPanelToFront(panelId);
+    
+    // Then open the individual panel (won't create duplicate if already exists)
     switch (item.type) {
       case 'EV Charging Station':
         openIndividualEV(item.index);
@@ -321,7 +463,7 @@ function App() {
       default:
         console.warn('Unknown equipment type:', item.type);
     }
-  }, [moveCameraToEquipment, openIndividualEV, openIndividualChiller, openIndividualAhu, openIndividualElectrical, openIndividualPump, openIndividualFire]);
+  }, [moveCameraToEquipment, bringPanelToFront, openIndividualEV, openIndividualChiller, openIndividualAhu, openIndividualElectrical, openIndividualPump, openIndividualFire]);
 
   // Camera control functions
   const handleCameraHome = useCallback(() => {
@@ -447,16 +589,16 @@ function App() {
 
         {/* Bottom-left dock buttons (dark/compact) */}
         <div style={{ position: 'absolute', bottom: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 4, background: 'rgba(17,24,39,0.6)', padding: 6, borderRadius: 10, border: '1px solid #1f2937', boxShadow: '0 8px 20px rgba(0,0,0,0.35)' }}>
-          <button title="Sidebar" onClick={toggleSidebar} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
-          <button title="Floors" onClick={toggleFloors} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
-          <button title="Equipment Overview" onClick={toggleEquipmentOverview} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
-          <button title="Filter" onClick={toggleFilter} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
-          <button title="EV Panel" onClick={toggleEV} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
+          <button title="Sidebar" onClick={toggleSidebarWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: sidebarVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>S</button>
+          <button title="Floors" onClick={toggleFloorsWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: floorsVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>FL</button>
+          <button title="Equipment Overview" onClick={toggleEquipmentOverviewWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: equipmentOverviewVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EQ</button>
+          <button title="Filter" onClick={toggleFilterWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: filterVisible ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>F</button>
+          <button title="EV Panel" onClick={toggleEVWrapped} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #374151', background: evPanelOpen ? '#4f46e5' : '#111827', color: '#e5e7eb', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>EV</button>
         </div>
 
         {/* Accident Controls Panel (draggable) */}
         {accidentOpen && (
-          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={200} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="accident" title="Accident Controls" position={accidentPos} setPosition={setAccidentPos} minimized={accidentMin} setMinimized={setAccidentMin} onClose={closeAccident} width={200} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('accident')} onPanelClick={bringPanelToFront}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button onClick={handleRandomAccident} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random accident</button>
               <button onClick={handleRandomEVFuseDrop} style={{ padding: '8px 10px', borderRadius: '8px', border: '1px solid #374151', background: '#111827', color: '#e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>Random Drop EV Fuse</button>
@@ -494,7 +636,7 @@ function App() {
 
         {/* Sidebar (draggable) */}
         {sidebarVisible && (
-          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="sidebar" title="Sidebar" position={sidebarPos} setPosition={setSidebarPos} minimized={sidebarMin} setMinimized={setSidebarMin} onClose={closeSidebar} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('sidebar')} onPanelClick={bringPanelToFront}>
             <div style={{ fontWeight: 800, borderBottom: '1px solid #1f2937', paddingBottom: '6px', marginBottom: '8px', color: '#e5e7eb' }}>System Status</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', background: '#0b1220', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
@@ -513,7 +655,7 @@ function App() {
 
         {/* Floors panel (draggable) */}
         {floorsVisible && (
-          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="floors" title="Floors" position={floorsPos} setPosition={setFloorsPos} minimized={floorsMin} setMinimized={setFloorsMin} onClose={closeFloors} width={220} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('floors')} onPanelClick={bringPanelToFront}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {['All Overview','Floor 1 - Lobby & EV','Floor 2 - Office','Floor 3 - Data Center','Floor 4 - Mechanical','Floor 5 - Rooftop'].map((t, i) => (
                 <button key={i} style={{ background: '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'left', fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>{t}</button>
@@ -524,25 +666,25 @@ function App() {
 
         {/* Equipment overview panel (draggable) */}
         {equipmentOverviewVisible && (
-          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="equipmentOverview" title="Equipment Overview" position={equipmentOverviewPos} setPosition={setEquipmentOverviewPos} minimized={equipmentOverviewMin} setMinimized={setEquipmentOverviewMin} onClose={closeEquipmentOverview} width={230} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('equipmentOverview')} onPanelClick={bringPanelToFront}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <button onClick={toggleChillerPanel} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleChillerPanelWrapped} style={{ background: chillerPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Chiller System (3)</span>
                 <span className={chillerIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: chillerIndicators.some(v => v === 'fault') ? '#ef4444' : '#f59e0b' }} />
               </button>
-              <button onClick={toggleAhuPanel} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleAhuPanelWrapped} style={{ background: ahuPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>AHU Units (12)</span>
                 <span className={ahuIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: ahuIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleElectricalPanel} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleElectricalPanelWrapped} style={{ background: electricalPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Electrical Panel (8)</span>
                 <span className={electricalIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: electricalIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={togglePumpPanel} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={togglePumpPanelWrapped} style={{ background: pumpPanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Water Pump System (6)</span>
                 <span className={pumpIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: pumpIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
-              <button onClick={toggleFirePanel} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
+              <button onClick={toggleFirePanelWrapped} style={{ background: firePanelOpen ? '#4f46e5' : '#0b1220', color: '#e5e7eb', border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', display: 'flex', justifyContent: 'space-between', cursor: 'pointer', fontSize: 12 }}>
                 <span style={{ fontWeight: 700 }}>Fire Alarm System (15)</span>
                 <span className={fireIndicators.some(v => v === 'fault') ? 'fault-indicator' : ''} style={{ width: '10px', height: '10px', borderRadius: '50%', background: fireIndicators.some(v => v === 'fault') ? '#ef4444' : '#10b981' }} />
               </button>
@@ -597,6 +739,9 @@ function App() {
           
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+
+          getPanelZIndex={getPanelZIndex}
+          bringPanelToFront={bringPanelToFront}
         />
 
         <IndividualUnitPanels
@@ -627,11 +772,14 @@ function App() {
           
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+
+          getPanelZIndex={getPanelZIndex}
+          bringPanelToFront={bringPanelToFront}
         />
 
         {/* Equipment Filter panel (draggable) */}
         {filterVisible && (
-          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={180} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="filter" title="Show Equipment" position={filterPos} setPosition={setFilterPos} minimized={filterMin} setMinimized={setFilterMin} onClose={closeFilter} width={180} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('filter')} onPanelClick={bringPanelToFront}>
             {[{label:'Chiller', state: showChiller, set:setShowChiller, color:'#3498db'}, {label:'AHU', state: showAHU, set:setShowAHU, color:'#2ecc71'}, {label:'Electrical', state: showElectrical, set:setShowElectrical, color:'#f39c12'}, {label:'Water Pump', state: showPump, set:setShowPump, color:'#9b59b6'}, {label:'Fire Alarm', state: showFire, set:setShowFire, color:'#e74c3c'}, {label:'EV Charging', state: showEV, set:setShowEV, color:'#1abc9c'}].map((it, idx) => (
               <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: it.color }} />
@@ -643,7 +791,7 @@ function App() {
         )}
 
         {evPanelOpen && (
-          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DraggablePanel panelId="ev" title="EV Charging Status" position={evPanelPos} setPosition={setEvPanelPos} minimized={evPanelMin} setMinimized={setEvPanelMin} onClose={closeEV} width={380} scrollPositions={scrollPositions} onDragStart={handleDragStart} onDragEnd={handleDragEnd} zIndex={getPanelZIndex('ev')} onPanelClick={bringPanelToFront}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: 8 }}>
               <div style={{ background: '#0b1220', borderLeft: '3px solid #1f2937', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
                 <div style={{ fontSize: '18px', fontWeight: 800 }}>{evSummary.total}</div>

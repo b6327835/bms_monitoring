@@ -35,7 +35,11 @@ export default function IndividualUnitPanels({
   
   // Drag callbacks
   onDragStart,
-  onDragEnd
+  onDragEnd,
+
+  // Z-index management
+  getPanelZIndex,
+  bringPanelToFront
 }) {
   return (
     <>
@@ -58,6 +62,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -100,6 +106,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -138,6 +146,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -176,6 +186,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -214,6 +226,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -252,6 +266,8 @@ export default function IndividualUnitPanels({
             width={350}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            zIndex={getPanelZIndex(unit.id)}
+            onPanelClick={bringPanelToFront}
           >
             <div style={{ border: '1px solid #1f2937', borderRadius: '8px', padding: '8px', background: '#0b1220' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>

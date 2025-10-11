@@ -13,7 +13,9 @@ const DraggablePanel = React.memo(({
   children,
   scrollPositions,
   onDragStart: onDragStartCallback,
-  onDragEnd: onDragEndCallback
+  onDragEnd: onDragEndCallback,
+  zIndex = 10,
+  onPanelClick
 }) => {
   const nodeRef = React.useRef(null);
   const contentRef = React.useRef(null);
@@ -79,6 +81,12 @@ const DraggablePanel = React.memo(({
     }
   };
   
+  const handlePanelClick = () => {
+    if (onPanelClick) {
+      onPanelClick(panelId);
+    }
+  };
+
   return (
     <Draggable
       nodeRef={nodeRef}
@@ -88,7 +96,24 @@ const DraggablePanel = React.memo(({
       onStop={handleDragStop}
       handle=".drag-handle"
     >
-      <div ref={nodeRef} style={{ position: 'absolute', width: minimizedWidth, background: 'rgba(17,24,39,0.95)', color: '#e5e7eb', borderRadius: 6, boxShadow: '0 8px 20px rgba(0,0,0,0.4)', border: '1px solid #1f2937', zIndex: 3, overflow: 'hidden', fontSize: 11, transition: 'width 0.2s ease' }}>
+      <div 
+        ref={nodeRef} 
+        onClick={handlePanelClick}
+        style={{ 
+          position: 'absolute', 
+          width: minimizedWidth, 
+          background: 'rgba(17,24,39,0.95)', 
+          color: '#e5e7eb', 
+          borderRadius: 6, 
+          boxShadow: '0 8px 20px rgba(0,0,0,0.4)', 
+          border: '1px solid #1f2937', 
+          zIndex: zIndex, 
+          overflow: 'hidden', 
+          fontSize: 11, 
+          transition: 'width 0.2s ease',
+          cursor: 'default'
+        }}
+      >
         <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', background: '#111827', cursor: 'move', borderBottom: minimized ? 'none' : '1px solid #1f2937', userSelect: 'none' }}>
           <div style={{ fontWeight: 700, fontSize: 10, letterSpacing: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
           <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>

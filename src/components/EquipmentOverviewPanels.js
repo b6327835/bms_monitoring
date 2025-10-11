@@ -49,13 +49,17 @@ export default function EquipmentOverviewPanels({
   
   // Drag callbacks
   onDragStart,
-  onDragEnd
+  onDragEnd,
+
+  // Z-index management
+  getPanelZIndex,
+  bringPanelToFront
 }) {
   return (
     <>
       {/* Chiller panel (draggable) */}
       {chillerPanelOpen && (
-        <DraggablePanel panelId="chillerPanel" title="Chiller System" position={chillerPanelPos} setPosition={setChillerPanelPos} minimized={chillerPanelMin} setMinimized={setChillerPanelMin} onClose={closeChillerPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggablePanel panelId="chillerPanel" title="Chiller System" position={chillerPanelPos} setPosition={setChillerPanelPos} minimized={chillerPanelMin} setMinimized={setChillerPanelMin} onClose={closeChillerPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd} zIndex={getPanelZIndex('chillerPanel')} onPanelClick={bringPanelToFront}>
           <div>
             {chillers.map((chiller) => {
               const statusColor = chiller.status === 'fault' ? '#ef4444' : '#10b981';
@@ -83,7 +87,7 @@ export default function EquipmentOverviewPanels({
 
       {/* AHU panel (draggable) */}
       {ahuPanelOpen && (
-        <DraggablePanel panelId="ahuPanel" title="AHU System" position={ahuPanelPos} setPosition={setAhuPanelPos} minimized={ahuPanelMin} setMinimized={setAhuPanelMin} onClose={closeAhuPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggablePanel panelId="ahuPanel" title="AHU System" position={ahuPanelPos} setPosition={setAhuPanelPos} minimized={ahuPanelMin} setMinimized={setAhuPanelMin} onClose={closeAhuPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd} zIndex={getPanelZIndex('ahuPanel')} onPanelClick={bringPanelToFront}>
           <div>
             {ahus.map((ahu) => {
               const statusColor = ahu.status === 'fault' ? '#ef4444' : '#10b981';
@@ -111,7 +115,7 @@ export default function EquipmentOverviewPanels({
 
       {/* Electrical panel (draggable) */}
       {electricalPanelOpen && (
-        <DraggablePanel panelId="electricalPanel" title="Electrical Panel" position={electricalPanelPos} setPosition={setElectricalPanelPos} minimized={electricalPanelMin} setMinimized={setElectricalPanelMin} onClose={closeElectricalPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggablePanel panelId="electricalPanel" title="Electrical Panel" position={electricalPanelPos} setPosition={setElectricalPanelPos} minimized={electricalPanelMin} setMinimized={setElectricalPanelMin} onClose={closeElectricalPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd} zIndex={getPanelZIndex('electricalPanel')} onPanelClick={bringPanelToFront}>
           <div>
             {electricals.map((electrical) => {
               const statusColor = electrical.status === 'fault' ? '#ef4444' : '#10b981';
@@ -139,7 +143,7 @@ export default function EquipmentOverviewPanels({
 
       {/* Pump panel (draggable) */}
       {pumpPanelOpen && (
-        <DraggablePanel panelId="pumpPanel" title="Water Pump System" position={pumpPanelPos} setPosition={setPumpPanelPos} minimized={pumpPanelMin} setMinimized={setPumpPanelMin} onClose={closePumpPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggablePanel panelId="pumpPanel" title="Water Pump System" position={pumpPanelPos} setPosition={setPumpPanelPos} minimized={pumpPanelMin} setMinimized={setPumpPanelMin} onClose={closePumpPanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd} zIndex={getPanelZIndex('pumpPanel')} onPanelClick={bringPanelToFront}>
           <div>
             {pumps.map((pump) => {
               const statusColor = pump.status === 'fault' ? '#ef4444' : '#10b981';
@@ -167,7 +171,7 @@ export default function EquipmentOverviewPanels({
 
       {/* Fire panel (draggable) */}
       {firePanelOpen && (
-        <DraggablePanel panelId="firePanel" title="Fire Alarm System" position={firePanelPos} setPosition={setFirePanelPos} minimized={firePanelMin} setMinimized={setFirePanelMin} onClose={closeFirePanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggablePanel panelId="firePanel" title="Fire Alarm System" position={firePanelPos} setPosition={setFirePanelPos} minimized={firePanelMin} setMinimized={setFirePanelMin} onClose={closeFirePanel} width={480} onDragStart={onDragStart} onDragEnd={onDragEnd} zIndex={getPanelZIndex('firePanel')} onPanelClick={bringPanelToFront}>
           <div>
             {fires.map((fire) => {
               const statusColor = fire.status === 'fault' ? '#ef4444' : '#10b981';
