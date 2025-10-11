@@ -519,7 +519,13 @@ function App() {
     };
   }, []);
 
-  // Memoized callbacks to prevent unnecessary re-renders (now from hook)
+  // Debug logging for testing
+  React.useEffect(() => {
+    console.log('Window width:', window.innerWidth);
+    console.log('Window height:', window.innerHeight);
+    console.log('Device pixel ratio:', window.devicePixelRatio);
+    console.log('Body font size:', window.getComputedStyle(document.body).fontSize);
+  }, []);
 
   if (!token) {
     return <LoginForm onLogin={setToken} />;
